@@ -1,0 +1,252 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contacts ENEO — v12_dark_full_zebra_v2 2025-09-11 13:06</title>
+<meta name="theme-color" content="#d1d5db">
+<style>
+:root{
+  --bg:#d1d5db; --card:#e5e7eb; --text:#0b1220; --muted:#374151; --border:#9ca3af; --accent:#2563eb;
+  --good:#bbf7d0; --bad:#fecaca; --warn:#fde68a;
+  --zebra1:#e5e7eb; --zebra2:#f3f4f6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial}
+.container{max-width:1100px;margin:0 auto;padding:14px}
+h1{display:flex;gap:8px;align-items:center;margin:0 0 10px;font-size:20px}
+.ver{font-size:12px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:3px 8px;background:#fff}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0}
+.small{color:var(--muted);font-size:12px}
+button{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-weight:600;cursor:pointer}
+button.secondary{background:#fff;color:var(--text);border:1px solid var(--border)}
+input[type="text"],input[type="email"],input[type="tel"],input[type="number"],input[type="date"],input[type="file"]{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 8px}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}
+thead th{font-size:12px;color:var(--muted);border-bottom:1px dashed var(--border);text-transform:uppercase}
+tbody tr{background:var(--zebra2);border:1px solid var(--border)}
+tbody tr:nth-child(odd){background:var(--zebra1)}
+tbody td{padding:10px 8px}
+tbody tr td:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}
+tbody tr td:last-child{border-top-right-radius:10px;border-bottom-right-radius:10px}
+/* State colors override zebra */
+tr.state-green{background:var(--good)!important}
+tr.state-red{background:var(--bad)!important}
+tr.state-yellow{background:var(--warn)!important}
+.amount input{width:6ch;text-align:right}
+.col-pres{width:58px}.col-amt{width:68px}
+.pres input[type="checkbox"]{width:22px;height:22px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111827;color:#e5e7eb;padding:8px 12px;border-radius:10px;border:1px solid #374151;display:none}
+.debug{font:12px ui-monospace,monospace;background:#111827;color:#f3f4f6;border:1px solid #374151;border-radius:10px;padding:8px;white-space:pre-wrap}
+@media print{body{background:#fff!important;color:#000!important}.card{box-shadow:none!important;border:none!important;background:#fff!important}
+table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after:auto}}
+</style></head><body>
+<div class="container">
+  <h1>Contacts ENEO — <span class="ver">v12_dark_full_zebra_v2 2025-09-11 13:06</span></h1>
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <label for="sessionDate">Date :</label><input id="sessionDate" type="date">
+      <button id="exportPDF" class="secondary">🖨️ PDF</button>
+      <button id="resetRoster" class="secondary">♻️ Réinitialiser</button>
+      <button id="saveRoster" class="secondary">💾 Sauver</button>
+      <button id="copyTable" class="secondary">📋 Copier (Prés/€/Nom/Prénom)</button>
+    </div>
+    <div id="diag" class="debug" style="margin-top:8px">Initialisation…</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button id="toggleAddForm">➕ Ajouter</button>
+      <input id="importCsv" type="file" accept=".csv">
+      <button id="importCsvReplace" class="secondary">Importer CSV (Remplacer)</button>
+      <button id="exportRosterJson" class="secondary">Exporter JSON</button>
+      <input id="importJson" type="file" accept=".json">
+      <button id="importRosterJson" class="secondary">Importer JSON</button>
+    </div>
+    <div id="addForm" style="display:none;margin-top:10px;gap:8px">
+      <input id="addNom" placeholder="Nom"><input id="addPrenom" placeholder="Prénom">
+      <input id="addGsm" placeholder="GSM (047...)"><input id="addMail" placeholder="Mail">
+      <button id="addMember">✅ Ajouter</button>
+    </div>
+  </div>
+  <div class="card">
+    <table id="tbl"><thead>
+      <tr><th class="col-pres">Prés.</th><th class="col-amt">€</th><th>Nom</th><th>Prénom</th><th>GSM</th><th>Mail</th><th>Actions</th></tr>
+    </thead><tbody id="tbody"></tbody></table>
+    <div class="small" style="margin-top:6px">
+      Présents: <span id="countPresence">0</span> — 
+      Présents gratuits: <span id="countFree">0</span> — 
+      Total €: <span id="sumAmount">0,0</span> — 
+      Inscrits: <span id="inscritsCounter">0</span>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">OK</div>
+<script>
+(function(){
+  const CSV_ROSTER = [{"nom": "ALLACKER", "prenom": "Paul", "gsm": "477621626", "mail": "paul.allacker@skynet.be"}, {"nom": "BOSSCHAERT", "prenom": "Françoise", "gsm": "474717828", "mail": "francoise.bosschaert@gmail.com"}, {"nom": "CHARLIER", "prenom": "Pierre", "gsm": "475677680", "mail": "charlier.pierre@skynet.be"}, {"nom": "CHIMKOVITCH", "prenom": "Sophie", "gsm": "474979997", "mail": "sophie.chimkovitch@gmail.om"}, {"nom": "DALLEUR", "prenom": "Jean-Paul", "gsm": "474877837", "mail": "dalleurj@gmail.com"}, {"nom": "DECONINCK", "prenom": "Jean-Pierre", "gsm": "476728383", "mail": "sra@lesanemones.be"}, {"nom": "DEGUENT", "prenom": "Marianne", "gsm": "474811346", "mail": "mdeguent7@gmail.com"}, {"nom": "DENIS", "prenom": "Pierrette", "gsm": "472720227", "mail": "Pierrette_denis@outlook.be"}, {"nom": "DEPIREUX", "prenom": "Dominique", "gsm": "479949630", "mail": "gekerado@gmail.com"}, {"nom": "DIEU", "prenom": "Bernard", "gsm": "476294840", "mail": "planetedit0@gmail.com"}, {"nom": "DOLVELDE", "prenom": "Dick", "gsm": "478780555", "mail": "dick.dolvelde@gmail.com"}, {"nom": "DONNAY", "prenom": "Jacques", "gsm": "476634435", "mail": "jack.donnay30@gmai.com"}, {"nom": "DUBOIS", "prenom": "Claude", "gsm": "477712083", "mail": "dubois.claude@hotmail.com"}, {"nom": "GILLET", "prenom": "Christiane", "gsm": "474693200", "mail": "christiane.gillet@hotmail.com"}, {"nom": "HEYTERS", "prenom": "Eric", "gsm": "475826923", "mail": "eric.heyters@gmail.com"}, {"nom": "LEGLISE", "prenom": "Stephan", "gsm": "476340062", "mail": "unpierreux@yahoo.fr"}, {"nom": "LEVEAU", "prenom": "José", "gsm": "479321442", "mail": "jcleveau@yahoo.fr"}, {"nom": "LEVELING", "prenom": "Josette", "gsm": "475386560", "mail": "josette.paulus@gmail.com"}, {"nom": "MAGERUS", "prenom": "Michel", "gsm": "476892128", "mail": "michelmagerus@gmail.com"}, {"nom": "MALDAGUE", "prenom": "Olivier", "gsm": "478371701", "mail": "olivier.maldague@gmail.com"}, {"nom": "PAPENS", "prenom": "Dominique", "gsm": "475993125", "mail": "dompapens@yahoo.fr"}, {"nom": "PAULUS", "prenom": "Christian", "gsm": "475284580", "mail": "chpaulus@gmail.com"}, {"nom": "PERROTIN", "prenom": "Hervé", "gsm": "472212131", "mail": "hymperrotin@gmail.com"}, {"nom": "PUTMANS", "prenom": "Yves", "gsm": "478669111", "mail": "yves.putmans@yahoo.fr"}, {"nom": "RION", "prenom": "Marc-Antoine", "gsm": "475388934", "mail": "marcantoinerion1965@gmail.com"}, {"nom": "SCHILDERMANS", "prenom": "Alain", "gsm": "475606443", "mail": "alain.schildermans@gmail.com"}, {"nom": "VAN PELT", "prenom": "Véronique", "gsm": "477456193", "mail": "veronique.vanpelt@icloud.com"}, {"nom": "VANCAPPELLEN", "prenom": "Arlette", "gsm": "477359066", "mail": "arlettevancap@hotmail.com"}, {"nom": "VANDEN BRUGGE", "prenom": "Andrée", "gsm": "475381914", "mail": "audrey.vdb.bruens@gmail.com"}, {"nom": "VANDENBROUCKE", "prenom": "Jacques", "gsm": "477261193", "mail": "javanwa41@gmail.com"}, {"nom": "VIGNERON", "prenom": "Jean-Marie", "gsm": "474921000", "mail": "jemavig@live.be"}, {"nom": "WERY", "prenom": "Jean-Luc", "gsm": "478293294", "mail": "weryjl@hotmail.fr"}, {"nom": "WINDAL", "prenom": "Benoît", "gsm": "475941124", "mail": "michele.et.benoit.windal@gmail.com"}];
+  // NEW storage key to avoid collision with previous empty save
+  const rosterKey='contacts-eneo:roster-override-zebra-v2';
+  const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+  const toast=(m)=>{const t=$('#toast');t.textContent=m||'OK';t.style.display='block';setTimeout(()=>t.style.display='none',1200)};
+  const diag=(msg)=>{ const d=$('#diag'); d.textContent = (d.textContent? d.textContent+"\n":"")+msg; };
+  const showErr=(msg)=>{ diag("ERREUR JS → "+msg); };
+  window.onerror = function(msg, src, line, col){ showErr(msg + " @ " + line + ":" + col); };
+
+  try{
+    diag("JS démarré ✅");
+
+    const normGSM=(s)=>{ if(!s) return ''; let t=String(s).trim().replace(/[^0-9+]/g,'');
+      if(t.startsWith('+324')) t='0'+t.slice(3);
+      if(!t.startsWith('0')) t='0'+t.replace(/^0+/,'');
+      if(t.startsWith('04')&&!t.startsWith('047')) t='047'+t.slice(3);
+      t=t.replace(/\D/g,''); if(t.length>10) t=t.slice(0,10); return t;
+    };
+
+    function loadRosterRaw(){
+      try{ const r=JSON.parse(localStorage.getItem(rosterKey)||'[]'); return Array.isArray(r)? r: []; }
+      catch(e){ return []; }
+    }
+    function loadRoster(){
+      let r = loadRosterRaw();
+      if(!r || r.length===0){
+        // auto-restore from CSV
+        r = CSV_ROSTER.slice();
+        localStorage.setItem(rosterKey, JSON.stringify(r));
+        diag("Liste restaurée à partir du CSV intégré");
+      }
+      return r.map(m=>({...m, gsm: normGSM(m.gsm||'')}));
+    }
+    function saveRoster(r){ r.forEach(m=>m.gsm=normGSM(m.gsm||'')); localStorage.setItem(rosterKey, JSON.stringify(r)); updateCounts(); }
+
+    function makeRow(m){
+      const tr=document.createElement('tr');
+      tr.innerHTML = '<td class="pres"><input type="checkbox"></td><td class="amount"><input type="number" step="0.5" min="0" placeholder="0,0"></td>' +
+                     '<td class="name"></td><td class="pre"></td><td class="gsm"></td><td class="mail"></td>' +
+                     '<td class="act"><button class="secondary editRow">✏️</button> <button class="secondary deleteRow">🗑️</button></td>';
+      tr.querySelector('.name').textContent = (m.nom||'').trim();
+      tr.querySelector('.pre').textContent  = (m.prenom||'').trim();
+      tr.querySelector('.gsm').textContent  = normGSM((m.gsm||'').trim());
+      tr.querySelector('.mail').textContent = (m.mail||'').trim();
+      return tr;
+    }
+    function rebuild(){
+      const tb=$('#tbody'); tb.innerHTML=''; const r=loadRoster(); r.forEach(m=>tb.appendChild(makeRow(m)));
+      $('#inscritsCounter').textContent = r.length; diag('JS OK — lignes: '+r.length); updateCounts();
+    }
+
+    function applyRowStates(){
+      $$('#tbl tbody tr').forEach(tr=>{
+        tr.classList.remove('state-green','state-red','state-yellow');
+        const present = tr.querySelector('.pres input').checked;
+        const txt     = (tr.querySelector('.amount input').value||'').trim();
+        const amt     = txt===''? null : (parseFloat(txt.replace(',','.'))||0);
+        if(present){
+          if(amt===null) tr.classList.add('state-yellow');
+          else if(amt>0) tr.classList.add('state-green');
+          else tr.classList.add('state-red');
+        }
+      });
+    }
+    function updateCounts(){
+      let p=0, total=0, free=0;
+      $$('#tbl tbody tr').forEach(tr=>{
+        const cb  = tr.querySelector('.pres input');
+        const txt = (tr.querySelector('.amount input').value||'').trim();
+        const amt = txt===''? null : (parseFloat(txt.replace(',','.'))||0);
+        if(cb.checked){ p++; if(amt===null) free++; if(amt!==null) total += amt; }
+        tr.querySelector('.gsm').textContent = normGSM(tr.querySelector('.gsm').textContent);
+      });
+      $('#countPresence').textContent = String(p);
+      $('#countFree').textContent = String(free);
+      $('#sumAmount').textContent = total.toFixed(1).replace('.',',');
+      applyRowStates();
+    }
+
+    document.addEventListener('input',e=>{
+      if(e.target.matches('.amount input')){
+        const tr=e.target.closest('tr');
+        tr.querySelector('.pres input').checked = (e.target.value||'').trim()!=='';
+      }
+      if(e.target.matches('.pres input,.amount input')) updateCounts();
+    });
+    document.addEventListener('change',e=>{
+      if(e.target.matches('.pres input')){
+        const tr=e.target.closest('tr');
+        if(!e.target.checked) tr.querySelector('.amount input').value='';
+        updateCounts();
+      }
+    });
+    document.addEventListener('click',e=>{
+      if(e.target.matches('.editRow')){
+        const tr=e.target.closest('tr');
+        const n=tr.querySelector('.name').textContent.trim(),
+              p=tr.querySelector('.pre').textContent.trim(),
+              g=tr.querySelector('.gsm').textContent.trim(),
+              m=tr.querySelector('.mail').textContent.trim();
+        tr.dataset.orig=[n,p,g,m].join('|');
+        tr.querySelector('.name').innerHTML = `<input class="e-name" value="${n}">`;
+        tr.querySelector('.pre').innerHTML  = `<input class="e-pre" value="${p}">`;
+        tr.querySelector('.gsm').innerHTML = `<input class="e-gsm" value="${g}">`;
+        tr.querySelector('.mail').innerHTML = `<input class="e-mail" value="${m}">`;
+        e.target.textContent='💾'; e.target.classList.add('saveRow'); e.target.classList.remove('editRow');
+      } else if(e.target.matches('.saveRow')){
+        const tr=e.target.closest('tr');
+        const n=tr.querySelector('.e-name').value.trim(),
+              p=tr.querySelector('.e-pre').value.trim(),
+              g=normGSM(tr.querySelector('.e-gsm').value.trim()),
+              m=tr.querySelector('.e-mail').value.trim();
+        const r=loadRoster();
+        const [oN,oP,oG,oM]=(tr.dataset.orig||'|||').split('|');
+        const idx=r.findIndex(x=>(x.nom||'')===oN&&(x.prenom||'')===oP&&(x.gsm||'')===oG&&(x.mail||'')===oM);
+        if(idx>=0) r[idx]={nom:n,prenom:p,gsm:g,mail:m}; else r.push({nom:n,prenom:p,gsm:g,mail:m});
+        saveRoster(r); rebuild(); toast('Membre modifié ✅');
+      } else if(e.target.matches('.deleteRow')){
+        const tr=e.target.closest('tr');
+        const parts=[tr.querySelector('.name').textContent.trim(),tr.querySelector('.pre').textContent.trim(),normGSM(tr.querySelector('.gsm').textContent.trim()),tr.querySelector('.mail').textContent.trim()];
+        const r=loadRoster().filter(x=>!((x.nom||'')===parts[0]&&(x.prenom||'')===parts[1]&&(x.gsm||'')===parts[2]&&(x.mail||'')===parts[3]));
+        saveRoster(r); rebuild(); toast('Membre supprimé 🗑️');
+      }
+    });
+
+    document.getElementById('toggleAddForm').addEventListener('click',()=>{
+      const f=document.getElementById('addForm'); f.style.display=(f.style.display==='none'?'flex':'none'); if(f.style.display==='') f.style.display='flex';
+    });
+    document.getElementById('addMember').addEventListener('click',()=>{
+      const n=document.getElementById('addNom').value.trim(), p=document.getElementById('addPrenom').value.trim(), g=normGSM(document.getElementById('addGsm').value.trim()), m=document.getElementById('addMail').value.trim();
+      if(!n && !p && !g && !m){ toast('Renseigne au moins Nom ou GSM'); return; }
+      const r=loadRoster(); r.push({nom:n,prenom:p,gsm:g,mail:m}); saveRoster(r); rebuild();
+      document.getElementById('addNom').value=document.getElementById('addPrenom').value=document.getElementById('addGsm').value=document.getElementById('addMail').value='';
+      toast('Membre ajouté ✅');
+    });
+
+    document.getElementById('copyTable').addEventListener('click', ()=>{
+      const rows=[['Présence','€','Nom','Prénom'].join('\t')];
+      Array.from(document.querySelectorAll('#tbl tbody tr')).forEach(tr=>{
+        const pres = tr.querySelector('.pres input').checked ? 1 : 0;
+        const eur  = (tr.querySelector('.amount input').value || '').trim();
+        const nom  = tr.querySelector('.name').textContent.trim();
+        const pre  = tr.querySelector('.pre').textContent.trim();
+        rows.push([pres, eur, nom, pre].join('\t'));
+      });
+      const tsv=rows.join('\n');
+      (navigator.clipboard && navigator.clipboard.writeText? navigator.clipboard.writeText(tsv) : Promise.reject())
+        .then(()=>toast('Copié ✅')).catch(()=>{ const ta=document.createElement('textarea'); ta.value=tsv; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Copié ✅'); });
+    });
+
+    document.getElementById('resetRoster').addEventListener('click',()=>{ localStorage.removeItem(rosterKey); rebuild(); toast('Liste réinitialisée ♻️'); });
+    document.getElementById('saveRoster').addEventListener('click',()=>{ saveRoster(loadRoster()); toast('Liste sauvegardée 💾'); });
+    document.getElementById('exportRosterJson').addEventListener('click',()=>{ const data=JSON.stringify(loadRoster(),null,2); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=`roster_${new Date().toISOString().slice(0,10)}.json`; a.click(); });
+    document.getElementById('importRosterJson').addEventListener('click',async()=>{ const f=document.getElementById('importJson').files[0]; if(!f){ toast('Choisis un JSON'); return; } try{ const arr=JSON.parse(await f.text()); if(!Array.isArray(arr)) throw 0; saveRoster(arr); rebuild(); toast('Liste importée ✅'); } catch(e){ toast('JSON invalide'); } });
+    document.getElementById('importCsvReplace').addEventListener('click',async()=>{ const f=document.getElementById('importCsv').files[0]; if(!f){ toast('Choisis un CSV'); return; } const txt=await f.text(); const lines=txt.trim().split(/\r?\n/); const sep=lines[0].includes(';')?';':',';
+      const cols=lines[0].split(sep).map(s=>s.trim().toLowerCase()); const idx=n=>cols.findIndex(c=>new RegExp(n).test(c));
+      const iNom=idx('^nom$'), iPre=idx('^pr|^pre'), iGsm=idx('gsm|t|mobile'), iMail=idx('mail|email'); const r=[];
+      for(let i=1;i<lines.length;i++){ const c=lines[i].split(sep); r.push({nom:(c[iNom]||'').trim(),prenom:(c[iPre]||'').trim(),gsm:normGSM(c[iGsm]||''),mail:(c[iMail]||'').trim()}); }
+      saveRoster(r); rebuild(); toast('Liste remplacée ✅');
+    });
+    document.getElementById('exportPDF').addEventListener('click',()=>window.print());
+
+    document.getElementById('sessionDate').value = (new Date()).toISOString().slice(0,10);
+    diag("Chargement des données…");
+    rebuild();
+  }catch(e){
+    showErr(e && e.message ? e.message : String(e));
+  }
+})();
+</script>
+</body></html>
