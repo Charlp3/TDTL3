@@ -67,10 +67,27 @@ tr.state-green{background:var(--good)!important} tr.state-red{background:var(--b
 @media print{body{background:#fff!important;color:#000!important}.card{box-shadow:none!important;border:none!important;background:#fff!important}
 table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after:auto}}
 
-/* visible date in header */
+/* toolbar layout patch: spacer to push right group */
+.toolbar-spacer-flex { flex: 1 1 auto; }
+#btnResetListFinal {
+  background-color: #dc3545 !important;
+  border-color: #dc3545 !important;
+  color: #fff !important;
+}
+#btnResetListFinal:hover {
+  background-color: #bb2d3b !important;
+  border-color: #b02a37 !important;
+}
+
+
+/* === FIXED ALL: header date + hide toolbar date === */
 .app-date{ margin-left:8px; font-size:14px; font-weight:700; color:#fff; white-space:nowrap; }
-/* hide the sessionDate input but keep it for scripts */
 #sessionDate{ position:absolute !important; left:-9999px !important; width:0 !important; height:0 !important; opacity:0 !important; pointer-events:none !important; }
+/* Reset red danger */
+#btnReset{ background-color:#dc3545 !important; border-color:#dc3545 !important; color:#fff !important; }
+#btnReset:hover{ background-color:#bb2d3b !important; border-color:#b02a37 !important; }
+/* Spacer for right group */
+.toolbar-spacer-flex{ flex:1 1 auto; }
 
 </style></head><body>
 <div class="wrapper">
@@ -333,26 +350,226 @@ table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after
 
 <script>
 (function(){
+  // Find the toolbar container
+  function findToolbar(){
+    var candidates = document.querySelectorAll('.controls, .toolbar, .actions, #toolbar');
+    if (candidates.length) return candidates[0];
+    // fallback: first parent that contains multiple buttons
+    var btns = document.querySelectorAll('button');
+    if (!btns.length) return null;
+    var p = btns[0].closest('div, header, section');
+    return p || btns[0].parentNode;
+  }
+
+  function qButtons(scope){
+    return (scope || document).querySelectorAll('button, .button, [role="button"]');
+  }
+
+  function findBtnByIdOrText(id, textsRe, emoji){
+    if (id){
+      var el = document.getElementById(id);
+      if (el) return el;
+    }
+    var re = textsRe ? new RegExp(textsRe, 'i') : null;
+    var list = qButtons();
+    for (var i=0;i<list.length;i++){
+      var b = list[i];
+      var t = (b.textContent || '').trim();
+      var title = (b.getAttribute('title') || '').trim();
+      if (emoji && (t.includes(emoji) || title.includes(emoji))) return b;
+      if (re && (re.test(t) || re.test(title))) return b;
+      // Also check data-* labels if any
+      var aria = (b.getAttribute('aria-label')||'') + ' ' + (b.getAttribute('data-label')||'');
+      if (re && re.test(aria)) return b;
+    }
+    return null;
+  }
+
+  function ensureFlex(container){
+    var cs = getComputedStyle(container);
+    if (cs.display !== 'flex'){
+      // Don't break existing styling; only force flex if it isn't already
+      container.style.display = 'flex';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = container.style.gap || '8px';
+      container.style.alignItems = container.style.alignItems || 'center';
+    }
+  }
+
+  function init(){
+    var bar = findToolbar();
+    if (!bar) return;
+
+    ensureFlex(bar);
+
+    // Identify buttons
+    var btnResetList = findBtnByIdOrText('btnReset','^réinitialiser(\\s+la\\s+liste)?$|^réinitialiser la liste|^réinitialiser$', '');
+    var btnPrint     = findBtnByIdOrText('btnPrint','imprimer|print','');
+    var btnEye       = findBtnByIdOrText('btnExpand','montrer|cacher|afficher','👁');
+    var btnSave      = findBtnByIdOrText('btnSave','sauver|sauvegarder','');
+    var btnResetCases= findBtnByIdOrText('btnResetCases','reset(\\s+des)?\\s*cases|réinitialiser\\s*cases|cases','');
+    var btnResetEuro = findBtnByIdOrText('btnResetEuro','€|euro|paiement|payer|reinit(ialiser)?\\s*€','€');
+    var btnCopy      = findBtnByIdOrText('btnCopy','copier|copy','');
+
+    // Build right-hand sequence (only append those that exist)
+    var rightOrder = [];
+    if (btnPrint) rightOrder.push(btnPrint);
+    if (btnEye) rightOrder.push(btnEye);
+    if (btnSave) rightOrder.push(btnSave);
+    // Some apps have a single button that resets both "cases & €". If we found both, keep their current doc order.
+    var pairs = [];
+    if (btnResetCases) pairs.push(btnResetCases);
+    if (btnResetEuro)  pairs.push(btnResetEuro);
+    for (var i=0;i<pairs.length;i++) rightOrder.push(pairs[i]);
+    if (btnCopy) rightOrder.push(btnCopy);
+
+    // Create a dedicated left reset (reuse existing element)
+    var leftReset = btnResetList;
+    if (!leftReset){
+      // fallback: create one if not present
+      leftReset = document.createElement('button');
+      leftReset.id = 'btnResetListFinal';
+      leftReset.textContent = 'Réinitialiser la liste';
+      bar.insertBefore(leftReset, bar.firstChild);
+    } else {
+      // Assign an id we can style, if not already
+      leftReset.id = leftReset.id || 'btnResetListFinal';
+    }
+
+    // Confirmation + red style
+    try{
+      leftReset.addEventListener('click', function(ev){
+        var ok = confirm('⚠️ Voulez-vous vraiment réinitialiser la liste ?');
+        if (!ok){ ev.preventDefault(); ev.stopPropagation(); return false; }
+        if (typeof window.resetList === 'function' && !leftReset.hasAttribute('onclick')){
+          ev.preventDefault(); ev.stopPropagation();
+          setTimeout(function(){ window.resetList(); }, 0);
+          return false;
+        }
+      }, true);
+      leftReset.style.backgroundColor = '#dc3545';
+      leftReset.style.borderColor = '#dc3545';
+      leftReset.style.color = '#fff';
+    }catch(e){}
+
+    // Now physically reorder: Left reset first, then a spacer, then right sequence in the requested order.
+    // Insert left at start
+    try { bar.insertBefore(leftReset, bar.firstChild); } catch(e){}
+
+    // Spacer
+    var spacer = document.createElement('div');
+    spacer.className = 'toolbar-spacer-flex';
+    // Insert spacer right after left reset
+    try {
+      if (!bar.querySelector('.toolbar-spacer-flex')){
+        if (leftReset.nextSibling) bar.insertBefore(spacer, leftReset.nextSibling);
+        else bar.appendChild(spacer);
+      } else {
+        spacer = bar.querySelector('.toolbar-spacer-flex');
+      }
+    } catch(e){}
+
+    // Append right group in order (moving existing nodes; no duplicates)
+    for (var i=0;i<rightOrder.length;i++){
+      var btn = rightOrder[i];
+      if (!btn || !btn.parentNode) continue;
+      try { bar.appendChild(btn); } catch(e){}
+    }
+  }
+
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else { init(); }
+})();
+</script>
+
+
+<script>
+(function(){
   function ymdToDmy(ymd){
     if(!ymd || ymd.indexOf('-') === -1) return '';
-    var p = ymd.split('-'); if(p.length!==3) return '';
+    var p = ymd.split('-'); if(p.length<3) return '';
     return p[2]+'/'+p[1]+'/'+p[0];
   }
   function updateHeaderDate(){
     var src = document.getElementById('sessionDate');
     var dst = document.getElementById('dateHeader');
     if(!src || !dst) return;
-    var v = src.value || (function(){ var d=new Date(); return d.toISOString().slice(0,10);}());
+    var v = src.value || new Date().toISOString().slice(0,10);
     dst.textContent = ymdToDmy(v);
   }
   if (document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', updateHeaderDate);
-  } else {
-    updateHeaderDate();
-  }
+  } else { updateHeaderDate(); }
   document.addEventListener('change', function(e){
     if(e && e.target && e.target.id==='sessionDate') updateHeaderDate();
   });
+})();
+</script>
+
+<script>
+(function(){
+  function findToolbar(){
+    var cands = document.querySelectorAll('.controls, .toolbar, .actions, #toolbar');
+    if (cands.length) return cands[0];
+    var btns = document.querySelectorAll('button');
+    return btns.length ? (btns[0].closest('div, header, section') || btns[0].parentNode) : null;
+  }
+  function qButtons(){ return document.querySelectorAll('button, .button, [role="button"]'); }
+  function findBtn(id, txtRe, emoji){
+    var el = id ? document.getElementById(id) : null;
+    if (el) return el;
+    var re = txtRe ? new RegExp(txtRe,'i') : null;
+    var list = qButtons();
+    for (var i=0;i<list.length;i++){
+      var b=list[i], t=(b.textContent||'').trim(), title=(b.getAttribute('title')||'').trim();
+      if (emoji && (t.includes(emoji)||title.includes(emoji))) return b;
+      if (re && (re.test(t)||re.test(title))) return b;
+      var aria=(b.getAttribute('aria-label')||'')+' '+(b.getAttribute('data-label')||'');
+      if (re && re.test(aria)) return b;
+    }
+    return null;
+  }
+  function ensureFlex(bar){
+    var cs=getComputedStyle(bar);
+    if (cs.display!=='flex'){ bar.style.display='flex'; bar.style.flexWrap='wrap'; bar.style.gap=bar.style.gap||'8px'; bar.style.alignItems=bar.style.alignItems||'center'; }
+  }
+  function ensureConfirmRed(btn){
+    if (!btn) return;
+    btn.addEventListener('click', function(ev){
+      var ok = confirm('⚠️ Voulez-vous vraiment réinitialiser la liste ?');
+      if (!ok){ ev.preventDefault(); ev.stopPropagation(); return false; }
+      if (typeof window.resetList === 'function' && !btn.hasAttribute('onclick')){
+        ev.preventDefault(); ev.stopPropagation(); setTimeout(function(){ window.resetList(); }, 0);
+        return false;
+      }
+    }, true);
+    btn.style.backgroundColor='#dc3545'; btn.style.borderColor='#dc3545'; btn.style.color='#fff';
+  }
+  function init(){
+    var bar = findToolbar(); if(!bar) return;
+    ensureFlex(bar);
+    // Identify buttons
+    var btnResetList = findBtn('btnReset','^réinitialiser(\s+la\s+liste)?$|^réinitialiser la liste|^réinitialiser$','');
+    var btnPrint     = findBtn('btnPrint','imprimer|print','');
+    var btnEye       = findBtn('btnExpand','montrer|cacher|afficher','👁');
+    var btnSave      = findBtn('btnSave','sauver|sauvegarder|enregistrer','');
+    var btnResetCases= findBtn('btnResetCases','reset(\s+des)?\s*cases|réinitialiser\s*cases|cases','');
+    var btnResetEuro = findBtn('btnResetEuro','€|euro|paiement|payer|reinit(ialiser)?\s*€','€');
+    var btnCopy      = findBtn('btnCopy','copier|copy','');
+    // LEFT: reset list
+    if (btnResetList){ try{ bar.insertBefore(btnResetList, bar.firstChild); }catch(e){} }
+    ensureConfirmRed(btnResetList);
+    // Spacer
+    var spacer = bar.querySelector('.toolbar-spacer-flex'); if(!spacer){ spacer=document.createElement('div'); spacer.className='toolbar-spacer-flex'; bar.appendChild(spacer); }
+    // RIGHT order
+    var rightBtns = [btnPrint, btnEye, btnSave];
+    if (btnResetCases) rightBtns.push(btnResetCases);
+    if (btnResetEuro)  rightBtns.push(btnResetEuro);
+    if (btnCopy)       rightBtns.push(btnCopy);
+    for (var i=0;i<rightBtns.length;i++){ var b=rightBtns[i]; if(b && b.parentNode){ try{ bar.appendChild(b); }catch(e){} } }
+  }
+  if (document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', init); } else { init(); }
 })();
 </script>
 
