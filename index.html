@@ -717,4 +717,56 @@ tbody tr:nth-child(odd).state-green  { background-color: #d4edda !important; } /
   });
 })();
 </script>
+
+<script id="eneo-counters">
+(function(){
+  const $ = (q, r=document) => r.querySelector(q);
+  const $$ = (q, r=document) => Array.from(r.querySelectorAll(q));
+
+  function parseEuro(raw){
+    if(raw == null) return 0;
+    const v = parseFloat(String(raw).trim().replace(",", "."));
+    return isNaN(v) ? 0 : v;
+  }
+
+  function updateCounters(){
+    const tbody = $("tbody");
+    if(!tbody) return;
+    let present = 0;
+    let total = 0;
+
+    $$("tr", tbody).forEach(tr => {
+      const cb = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
+      const euro = tr.querySelector('.amount input, input.euro');
+      if(cb && cb.checked) present += 1;
+      if(euro){
+        total += parseEuro(euro.value);
+      }
+    });
+
+    const cp = $("#countPresent");
+    if(cp) cp.textContent = String(present);
+    const te = $("#totalEuro");
+    if(te) te.textContent = String(total).replace('.', ',');
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    updateCounters();
+    const tbody = document.querySelector("tbody");
+    if(!tbody) return;
+    tbody.addEventListener("change", updateCounters, false);
+    tbody.addEventListener("input", updateCounters, false);
+    // Hook reset buttons to refresh counters after reset (capture already handled elsewhere)
+    document.addEventListener("click", function(ev){
+      const btn = ev.target.closest ? ev.target.closest("button, [role='button']") : null;
+      if(!btn) return;
+      const txt = (btn.textContent||"").toLowerCase();
+      if(/réinitialiser\s+la\s+liste/.test(txt) || btn.matches("#btnResetList, #btnReset, #btnResetListFinal")){
+        // Delay a tick to let UI clear
+        setTimeout(updateCounters, 0);
+      }
+    }, true);
+  });
+})();
+</script>
 </body></html>
