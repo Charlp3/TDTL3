@@ -67,8 +67,10 @@ tr.state-green{background:var(--good)!important} tr.state-red{background:var(--b
 @media print{body{background:#fff!important;color:#000!important}.card{box-shadow:none!important;border:none!important;background:#fff!important}
 table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after:auto}}
 
-/* visible header date mirrored from #sessionDate */
+/* visible date in header */
 .app-date{ margin-left:8px; font-size:14px; font-weight:700; color:#fff; white-space:nowrap; }
+/* hide the sessionDate input but keep it for scripts */
+#sessionDate{ position:absolute !important; left:-9999px !important; width:0 !important; height:0 !important; opacity:0 !important; pointer-events:none !important; }
 
 </style></head><body>
 <div class="wrapper">
@@ -333,43 +335,23 @@ table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after
 (function(){
   function ymdToDmy(ymd){
     if(!ymd || ymd.indexOf('-') === -1) return '';
-    var parts = ymd.split('-'); // [YYYY,MM,DD]
-    if(parts.length !== 3) return '';
-    return parts[2]+'/'+parts[1]+'/'+parts[0];
+    var p = ymd.split('-'); if(p.length!==3) return '';
+    return p[2]+'/'+p[1]+'/'+p[0];
   }
   function updateHeaderDate(){
-    try{
-      var src = document.getElementById('sessionDate');
-      var dst = document.getElementById('dateHeader');
-      if(!src || !dst) return;
-      var v = src.value;
-      if(!v){
-        // fallback to today
-        var d = new Date();
-        v = d.toISOString().slice(0,10);
-      }
-      dst.textContent = ymdToDmy(v);
-    }catch(e){ /* silent */ }
+    var src = document.getElementById('sessionDate');
+    var dst = document.getElementById('dateHeader');
+    if(!src || !dst) return;
+    var v = src.value || (function(){ var d=new Date(); return d.toISOString().slice(0,10);}());
+    dst.textContent = ymdToDmy(v);
   }
-  function scheduleMidnightRefresh(){
-    var now = new Date();
-    var midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1, 0, 0, 2);
-    var ms = midnight - now;
-    setTimeout(function(){ updateHeaderDate(); scheduleMidnightRefresh(); }, ms);
-  }
-  // Run when DOM ready
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){
-      updateHeaderDate();
-      scheduleMidnightRefresh();
-    });
+    document.addEventListener('DOMContentLoaded', updateHeaderDate);
   } else {
     updateHeaderDate();
-    scheduleMidnightRefresh();
   }
-  // Update when the input date changes
   document.addEventListener('change', function(e){
-    if(e && e.target && e.target.id === 'sessionDate'){ updateHeaderDate(); }
+    if(e && e.target && e.target.id==='sessionDate') updateHeaderDate();
   });
 })();
 </script>
