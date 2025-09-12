@@ -89,7 +89,19 @@ table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after
 /* Spacer for right group */
 .toolbar-spacer-flex{ flex:1 1 auto; }
 
-</style></head><body>
+</style>
+
+
+<style id="eneo-color-rules">
+/* ENEO v4.0 — Couleurs UNIFORMES pour tous les rangs (odd/even identiques) */
+tbody tr.state-yellow,
+tbody tr:nth-child(odd).state-yellow { background-color: #fff3cd !important; } /* jaune (uniforme) */
+tbody tr.state-red,
+tbody tr:nth-child(odd).state-red    { background-color: #f8d7da !important; } /* rouge (uniforme) */
+tbody tr.state-green,
+tbody tr:nth-child(odd).state-green  { background-color: #d4edda !important; } /* vert (uniforme) */
+</style>
+</head><body>
 <div class="wrapper">
 <div class="topbar">
   <div class="container">
@@ -573,4 +585,136 @@ table,thead,tbody,tr,td,th{page-break-inside:avoid!important}tr{page-break-after
 })();
 </script>
 
+
+<script id="eneo-logic-rules">
+(function(){
+  const KEY = "eneo-v4-state";
+  const $ = (q, r=document) => r.querySelector(q);
+  const $$ = (q, r=document) => Array.from(r.querySelectorAll(q));
+  const norm = s => (s||"").normalize("NFKC").trim().replace(/\s+/g," ");
+  const rowKey = tr => {
+    const nameCell = tr.querySelector("td.name") || tr.cells?.[1];
+    const preCell  = tr.querySelector("td.pre")  || tr.cells?.[2];
+    return norm(nameCell ? nameCell.textContent : "") + "|" + norm(preCell ? preCell.textContent : "");
+  };
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } };
+  const save = (st) => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch(e){} };
+
+  let state = load();
+
+  function parseEuroInput(input){
+    if(!input) return { empty:true, value:0 };
+    const raw = String(input.value||"").trim();
+    if(raw === "") return { empty:true, value:0 };
+    const v = parseFloat(raw.replace(",", "."));
+    return { empty:false, value: (isNaN(v)?0:v) };
+  }
+
+  function setRowClass(tr, cls){
+    tr.classList.remove("state-yellow","state-red","state-green");
+    if(cls) tr.classList.add(cls);
+  }
+
+  function updateRowState(tr){
+    const cb = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
+    const euro = tr.querySelector('.amount input, input.euro');
+    if(!cb){ setRowClass(tr, null); return; }
+    if(!cb.checked){ setRowClass(tr, null); return; }
+
+    const parsed = parseEuroInput(euro);
+    if(parsed.empty){ setRowClass(tr, "state-yellow"); return; }
+    if(parsed.value <= 0){ setRowClass(tr, "state-red"); return; }
+    setRowClass(tr, "state-green");
+  }
+
+  function applyOnce(){
+    const rows = $$("tbody tr");
+    rows.forEach(tr => {
+      const k = rowKey(tr); if(!k) return;
+      const s = state[k]; if(!s) return;
+      const cb   = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
+      const euro = tr.querySelector('.amount input, input.euro');
+      if(cb)   cb.checked = !!s.p;
+      if(euro) euro.value = (s.e === undefined || s.e === null) ? (euro.value||"") : String(s.e);
+      updateRowState(tr);
+    });
+  }
+
+  function bindDelegated(){
+    const tbody = $("tbody");
+    if(!tbody) return;
+
+    tbody.addEventListener("change", function(ev){
+      const t = ev.target;
+      const tr = t.closest && t.closest("tr");
+      if(!tr) return;
+      const k = rowKey(tr); if(!k) return;
+
+      if(t.matches('.pres input[type="checkbox"], input.present, input[type="checkbox"].present')){
+        state[k] = state[k] || {};
+        state[k].p = !!t.checked;
+        // Ne pas toucher au champ euro ici, juste couleurs
+        updateRowState(tr);
+        save(state);
+      } else if (t.matches('input.euro, .amount input[type="number"]')){
+        state[k] = state[k] || {};
+        // On enregistre la string pour garder "vide" distinct de "0"
+        state[k].e = String(t.value||"");
+        updateRowState(tr);
+        save(state);
+      }
+    }, false);
+
+    tbody.addEventListener("input", function(ev){
+      const t = ev.target;
+      if(!t.matches('input.euro, .amount input[type="number"]')) return;
+      const tr = t.closest && t.closest("tr");
+      if(!tr) return;
+      const k = rowKey(tr); if(!k) return;
+      state[k] = state[k] || {};
+      state[k].e = String(t.value||"");
+      updateRowState(tr);
+      save(state);
+    }, false);
+  }
+
+  // SINGLE CONFIRM RESET — capture guard
+  function installOneConfirmGuard(){
+    const isResetBtn = (el) => {
+      if(!el) return false;
+      if(el.matches && (el.matches("#btnResetListFinal, #btnReset, #btnResetList"))) return true;
+      const txt = (el.textContent||"").toLowerCase();
+      return /réinitialiser\s+la\s+liste/.test(txt);
+    };
+
+    document.addEventListener("click", function(ev){
+      const btn = ev.target.closest ? ev.target.closest("button, [role='button']") : null;
+      if(!btn || !isResetBtn(btn)) return;
+
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+
+      const ok = confirm("⚠️ Réinitialiser complètement la LISTE (présences et montants €) ?");
+      if(!ok) return;
+
+      state = {};
+      save(state);
+      const rows = $$("tbody tr");
+      rows.forEach(tr => {
+        const cb   = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
+        const euro = tr.querySelector('.amount input, input.euro');
+        if(cb) cb.checked = false;
+        if(euro) euro.value = "";
+        setRowClass(tr, null);
+      });
+    }, true); // capture
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    applyOnce();
+    bindDelegated();
+    installOneConfirmGuard();
+  });
+})();
+</script>
 </body></html>
