@@ -1015,4 +1015,80 @@ tbody tr.state-green * { background-color: transparent; }
         attachRemember(); reapplyIfNeeded();
       }
     })();
-    </script></body></html>
+    </script><script id="eneo-date-auto-v50">
+    (function(){
+      function formatLong(d){
+        try{
+          return d.toLocaleDateString('fr-BE', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+        }catch(e){
+          // Fallback
+          const dd = String(d.getDate()).padStart(2,'0');
+          const mm = String(d.getMonth()+1).padStart(2,'0');
+          const yyyy = d.getFullYear();
+          return dd + '/' + mm + '/' + yyyy;
+        }
+      }
+      function updateDateDisplay(){
+        var now = new Date();
+        var txt = formatLong(now);
+        // Try common targets by id or class; update first ones found if empty or looks like a date
+        var candidates = [];
+        ['todayDate','date','today','currentDate'].forEach(function(id){
+          var el = document.getElementById(id);
+          if(el) candidates.push(el);
+        });
+        // also query by class
+        var cls = document.querySelector('.today') || document.querySelector('.date') || document.querySelector('.currentDate');
+        if(cls) candidates.push(cls);
+        // de-duplicate
+        var seen = new Set(); var els = [];
+        candidates.forEach(function(el){ if(el && !seen.has(el)){ seen.add(el); els.push(el); }});
+        if(els.length){
+          els.forEach(function(el){ el.textContent = txt; });
+        }
+      }
+      // Run on load
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', updateDateDisplay, {once:true});
+      } else {
+        updateDateDisplay();
+      }
+      // Run when app resumes from background (iOS/Mac)
+      document.addEventListener('visibilitychange', function(){
+        if(!document.hidden) updateDateDisplay();
+      });
+      // Expose for other scripts if needed
+      window.__updateDateDisplay = updateDateDisplay;
+    })();
+    </script><script id="eneo-date-auto-v50c">
+(function(){
+  function toISODate(d){
+    var y=d.getFullYear();
+    var m=String(d.getMonth()+1).padStart(2,'0');
+    var day=String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+day;
+  }
+  function fmtFR(d){
+    var dd = String(d.getDate()).padStart(2,'0');
+    var mm = String(d.getMonth()+1).padStart(2,'0');
+    var yyyy = d.getFullYear();
+    return dd+'/'+mm+'/'+yyyy;
+  }
+  function updateHeaderDate(){
+    var now=new Date();
+    var header=document.getElementById('dateHeader');
+    if(header){ header.textContent = fmtFR(now); }
+    var inp=document.getElementById('sessionDate');
+    if(inp && inp.tagName==='INPUT'){ inp.value = toISODate(now); }
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', updateHeaderDate, {once:true});
+  } else {
+    updateHeaderDate();
+  }
+  document.addEventListener('visibilitychange', function(){
+    if(!document.hidden) updateHeaderDate();
+  });
+  window.__updateHeaderDate = updateHeaderDate;
+})();
+</script></body></html>
