@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestion Classe – Dessin (couleurs)</title>
+<style>
+  :root{
+    --bg:#f7f7fb; --panel:#ffffff; --ink:#1d2330; --muted:#6b7280;
+    --accent:#6c5ce7; --accent-2:#00c7b7; --warn:#ffb020; --danger:#ff5a5f;
+    --ok:#16a34a; --border:#e5e7eb; --chip:#eef2ff;
+    --radius:14px; --shadow:0 6px 18px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color:var(--ink); background:linear-gradient(180deg,#fafbff, #f5f7ff);
+  }
+  header{
+    position:sticky; top:0; z-index:10; background:rgba(255,255,255,.82); backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .bar{display:flex; gap:.5rem; align-items:center; padding:.6rem .8rem; max-width:1100px; margin:0 auto;}
+  .brand{display:flex; align-items:center; gap:.6rem; font-weight:800; letter-spacing:.2px}
+  .brand .logo{width:34px; height:34px; border-radius:10px; background:conic-gradient(from 180deg at 50% 50%, #ff7675, #ffeaa7, #55efc4, #74b9ff, #a29bfe, #ff7675); box-shadow:var(--shadow)}
+  .spacer{flex:1}
+  .bar .btn{padding:.65rem .9rem; border-radius:12px; border:1px solid var(--border); background:#fff; cursor:pointer}
+
+  .grid{
+    max-width:1100px; margin:1rem auto; padding:0 .8rem;
+    display:grid; grid-template-columns: 1.2fr .8fr; gap:1rem;
+  }
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+  .panel header{position:unset; border:0; background:linear-gradient(180deg,#fff, #fbfbff)}
+  .panel h2{margin:0; padding:1rem 1rem .4rem; font-size:1.05rem}
+  .panel .sub{color:var(--muted); font-size:.9rem; padding:0 1rem 1rem}
+  .section{padding:1rem}
+  .row{display:flex; align-items:center; gap:.6rem; flex-wrap:wrap}
+  .stack{display:flex; flex-direction:column; gap:.6rem}
+  input[type=text], input[type=number], input[type=date], select, textarea, input[type=color]{
+    width:100%; padding:.7rem .8rem; border:1px solid var(--border); border-radius:12px; background:#fff;
+  }
+  input[type=color]{ padding:.35rem; height:42px }
+  .btn{
+    display:inline-flex; align-items:center; gap:.5rem; padding:.7rem .95rem;
+    border-radius:12px; border:none; cursor:pointer; font-weight:600;
+    background:var(--accent); color:#fff; box-shadow:0 8px 16px rgba(108,92,231,.22);
+  }
+  .btn.secondary{background:#fff; color:var(--ink); border:1px solid var(--border); box-shadow:none}
+  .btn.ok{background:var(--ok)}
+  .btn.warn{background:var(--warn)}
+  .btn.danger{background:var(--danger)}
+  .btn.ghost{background:transparent; color:var(--ink); border:1px dashed var(--border)}
+
+  .list{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:.8rem}
+  .kid{
+    --kid-accent:#c7d2fe;
+    background:#fff; border:1px solid var(--border); border-radius:14px; padding:.8rem; display:flex; flex-direction:column; gap:.6rem;
+    min-height:140px; position:relative; overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .kid::before{
+    content:""; position:absolute; inset:0 0 auto 0; height:6px; background:var(--kid-accent);
+  }
+  .kid header{display:flex; align-items:center; gap:.6rem; padding:0}
+  .avatar{
+    width:40px; height:40px; border-radius:12px; flex:none;
+    display:grid; place-items:center; color:#fff; font-weight:800;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,.35);
+  }
+  .kid .name{font-weight:700}
+  .tags{display:flex; gap:.35rem; flex-wrap:wrap}
+  .tag{
+    font-size:.78rem; padding:.25rem .45rem; border-radius:999px; background:var(--chip); color:#444; border:1px solid #e0e7ff;
+  }
+  .stars{display:flex; gap:.2rem}
+  .star{width:22px; height:22px; cursor:pointer; filter:grayscale(1) opacity(.5)}
+  .star.on{filter:none}
+  .kid .actions{display:flex; gap:.4rem; flex-wrap:wrap}
+  .pill{padding:.45rem .6rem; border-radius:999px; border:1px solid var(--border); background:#fff; font-size:.85rem}
+  .present{background:#ecfdf5; color:#065f46; border-color:#a7f3d0}
+  .absent{background:#fff7ed; color:#9a3412; border-color:#fed7aa}
+  .footer{display:flex; gap:.5rem; justify-content:space-between; align-items:center; margin-top:.4rem;}
+  .small{font-size:.82rem; color:var(--muted)}
+  .tools{display:grid; gap:1rem}
+  .tool{padding:1rem}
+  .divider{height:1px; background:var(--border); margin:.6rem 0}
+  .kbd{font-variant-numeric:tabular-nums; font-family:ui-monospace, SFMono-Regular, Menlo, monospace;}
+  .empty{padding:1rem; color:var(--muted)}
+  .link{color:var(--accent); text-decoration:none}
+  .danger-zone{background:#fff5f5; border:1px solid #ffd1d1; padding:.8rem; border-radius:12px}
+  .toast{
+    position:fixed; right:12px; bottom:12px; background:#111827; color:#fff; padding:.7rem .9rem; border-radius:10px; box-shadow:var(--shadow); z-index:999; opacity:0; transform:translateY(10px); transition:.25s;
+  }
+  .toast.show{opacity:1; transform:translateY(0)}
+  .badge{display:inline-flex; align-items:center; gap:.35rem; font-size:.83rem; padding:.25rem .5rem; border-radius:10px; background:#eef2ff; border:1px solid #e5e7ff}
+  .sr-only{position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden}
+  .ghost{opacity:.6; transform:scale(.98)}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar" role="navigation" aria-label="Barre d’outils">
+    <div class="brand"><div class="logo" aria-hidden="true"></div> Gestion Classe – Dessin</div>
+    <div class="spacer"></div>
+    <button class="btn secondary" id="btnExport" title="Exporter les données (JSON)">📤 Export</button>
+    <label class="btn secondary" for="fileImport" title="Importer (JSON)">📥 Import</label>
+    <input id="fileImport" type="file" accept="application/json" class="sr-only" />
+    <button class="btn ok" id="btnPrint" title="Imprimer un petit rapport">🖨️ Imprimer</button>
+  </div>
+</header>
+
+<main class="grid" id="app" aria-live="polite">
+  <!-- Colonne gauche : élèves -->
+  <section class="panel">
+    <header>
+      <h2>Élèves</h2>
+      <p class="sub">Ajoutez les enfants, prenez les présences du jour (<span id="today"></span>) et attribuez des étoiles ⭐. Maintenant avec <strong>couleur</strong> par élève.</p>
+    </header>
+    <div class="section">
+      <div class="row">
+        <input id="kidName" placeholder="Prénom de l’enfant" aria-label="Prénom">
+        <input id="kidAge" type="number" min="2" max="8" placeholder="Âge" aria-label="Âge">
+        <input id="kidGuardian" placeholder="Parent/Tuteur" aria-label="Parent ou tuteur">
+        <input id="kidNotes" placeholder="Allergies/Notes" aria-label="Notes">
+        <input id="kidColor" type="color" value="#6c5ce7" aria-label="Couleur de l’élève" title="Couleur de l’élève">
+        <button class="btn" id="addKid">➕ Ajouter</button>
+      </div>
+      <div class="divider"></div>
+      <div class="row" style="justify-content:space-between; align-items:center">
+        <div class="badge">Présences du jour : <span id="countPresent" class="kbd">0</span></div>
+        <div class="row">
+          <button class="btn secondary" id="btnAllPresent">Tout le monde présent</button>
+          <button class="btn secondary" id="btnClearPresence">Effacer la présence</button>
+        </div>
+      </div>
+
+      <div class="list" id="kidList" aria-label="Liste des élèves"></div>
+      <div class="empty" id="emptyState">Aucun élève pour l’instant. Ajoutez des prénoms ci-dessus. 😊</div>
+    </div>
+  </section>
+
+  <!-- Colonne droite : outils -->
+  <aside class="tools">
+    <section class="panel">
+      <header>
+        <h2>Outils de cours</h2>
+        <p class="sub">Minuteur ⏱️, tirage au sort 🎲, activités 🎨.</p>
+      </header>
+      <div class="tool stack">
+        <!-- Timer -->
+        <div class="stack">
+          <strong>Minuteur</strong>
+          <div class="row">
+            <select id="timerPreset" aria-label="Durée du minuteur">
+              <option value="300">5 min</option>
+              <option value="600">10 min</option>
+              <option value="900">15 min</option>
+              <option value="180">3 min – Rangement</option>
+              <option value="60">1 min – Transition</option>
+            </select>
+            <button class="btn" id="timerStart">Démarrer</button>
+            <button class="btn warn" id="timerPause">Pause</button>
+            <button class="btn danger" id="timerReset">Reset</button>
+          </div>
+          <div class="kbd" id="timerDisplay" aria-live="polite">00:00</div>
+          <audio id="beep" preload="auto">
+            <!-- petit beep (silence si bloqué) -->
+            <source src="data:audio/mp3;base64,//uQZAAAAAAAAAAAAAAAAAAAA" type="audio/mp3">
+          </audio>
+        </div>
+        <div class="divider"></div>
+        <!-- Random picker -->
+        <div class="stack">
+          <strong>Tirage au sort</strong>
+          <div class="row">
+            <button class="btn" id="btnPick">🎲 Choisir un enfant</button>
+            <div id="pickResult" class="kbd"></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <!-- Activity themes -->
+        <div class="stack">
+          <strong>Activités</strong>
+          <div class="row">
+            <input id="activityInput" placeholder="Ex: Dessiner un chat au feutre">
+            <button class="btn" id="addActivity">➕</button>
+          </div>
+          <ul id="activityList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Données & Sécurité</h2>
+        <p class="sub">Sauvegarde auto locale. Export/Import JSON. Export CSV rapide.</p>
+      </header>
+      <div class="tool stack">
+        <button class="btn secondary" id="btnExportCSV">Exporter présences (CSV)</button>
+        <div class="danger-zone">
+          <strong>Zone à risques</strong>
+          <p class="small">Réinitialiser supprime tous les élèves, présences, activités et étoiles.</p>
+          <button class="btn danger" id="btnReset">🗑️ Réinitialiser</button>
+        </div>
+      </div>
+    </section>
+  </aside>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ========= Stockage & État ========= */
+const DB_KEY = 'artclass.v2.color';
+const state = {
+  kids: [],        // {id,name,age,guardian,notes,color,stars:int, order:int}
+  sessions: {},    // dateISO -> { kidId:booleanPresent }
+  activities: [],  // {id,text,done:boolean}
+};
+
+/* ========= Utilitaires ========= */
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const uid = () => Math.random().toString(36).slice(2,9);
+const todayISO = () => new Date().toISOString().slice(0,10);
+const save = () => localStorage.setItem(DB_KEY, JSON.stringify(state));
+const load = () => {
+  const raw = localStorage.getItem(DB_KEY);
+  if(!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    ['kids','sessions','activities'].forEach(k=>{
+      if(data[k]!==undefined) state[k]=data[k];
+    });
+  }catch(e){console.error('Load error', e)}
+};
+const toast = (msg)=>{ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); };
+const niceInitials = (name)=> name.trim().split(/\s+/).slice(0,2).map(s=>s[0]?.toUpperCase()||'').join('');
+const randColor = ()=> {
+  // palette douce mais contrastée (hex)
+  const p=['#ef4444','#f59e0b','#10b981','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#22c55e','#14b8a6','#eab308','#f97316'];
+  return p[Math.floor(Math.random()*p.length)];
+};
+const gradientFrom = (hex)=> `linear-gradient(135deg, ${hex}, ${shade(hex,-10)})`;
+function shade(hex,percent){
+  // petit ajustement de luminosité
+  const v = hex.replace('#','');
+  const bigint = parseInt(v,16);
+  let r=(bigint>>16)&255, g=(bigint>>8)&255, b=bigint&255;
+  const f=(c)=>Math.max(0,Math.min(255, Math.round(c + (percent/100)*255)));
+  r=f(r); g=f(g); b=f(b);
+  return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+}
+const formatTime = (sec)=> {
+  const m=String(Math.floor(sec/60)).padStart(2,'0');
+  const s=String(sec%60).padStart(2,'0');
+  return `${m}:${s}`;
+};
+
+/* ========= Rendu Élèves ========= */
+function renderKids(){
+  const list = $('#kidList');
+  list.innerHTML='';
+  const kidsSorted = [...state.kids].sort((a,b)=> (a.order??0)-(b.order??0));
+  if(kidsSorted.length===0){ $('#emptyState').style.display='block'; }
+  else { $('#emptyState').style.display='none'; }
+  const date = todayISO();
+  if(!state.sessions[date]) state.sessions[date]={};
+  let presentCount = 0;
+
+  kidsSorted.forEach(k=>{
+    const card = document.createElement('div');
+    card.className='kid'; card.draggable=true; card.dataset.id=k.id;
+    // accent et avatar en fonction de la couleur choisie
+    const accent = k.color || randColor();
+    card.style.setProperty('--kid-accent', accent);
+
+    // Drag & drop ordering
+    card.addEventListener('dragstart', (e)=>{ card.classList.add('ghost'); e.dataTransfer.setData('text/plain', k.id); });
+    card.addEventListener('dragend', ()=> card.classList.remove('ghost'));
+    card.addEventListener('dragover', (e)=>{ e.preventDefault(); const draggingId = e.dataTransfer.getData('text/plain'); if(draggingId && draggingId!==k.id){ card.style.outline='2px dashed #c7d2fe'; }});
+    card.addEventListener('dragleave', ()=> card.style.outline='');
+    card.addEventListener('drop', (e)=>{ e.preventDefault(); card.style.outline=''; const fromId=e.dataTransfer.getData('text/plain'); reorderKid(fromId,k.id); });
+
+    // header
+    const h = document.createElement('header');
+    const av = document.createElement('div'); av.className='avatar'; av.style.background=gradientFrom(accent); av.textContent=niceInitials(k.name); av.setAttribute('aria-hidden','true');
+    const name = document.createElement('div'); name.className='name'; name.textContent=k.name;
+    const ageTag = document.createElement('span'); ageTag.className='tag'; ageTag.textContent=(k.age? `${k.age} ans`:'');
+    h.append(av, name, ageTag);
+
+    // tags row
+    const tags = document.createElement('div'); tags.className='tags';
+    if(k.guardian) tags.append(chip('👨‍👩‍👧‍👦 '+k.guardian));
+    if(k.notes) tags.append(chip('🩺 '+k.notes));
+    tags.append(chip('🎨 Couleur'));
+
+    // stars
+    const stars = document.createElement('div'); stars.className='stars'; stars.setAttribute('aria-label','Étoiles');
+    for(let i=1;i<=5;i++){
+      const s = document.createElement('img');
+      s.src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="%23fbbf24" stroke="%23b45309"><path d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.79 1.402 8.168L12 18.896l-7.336 3.872 1.402-8.168L.132 9.21l8.2-1.192z"/></svg>';
+      s.className='star'+(i<=k.stars?' on':'');
+      s.title='Attribuer des étoiles'; s.setAttribute('role','button');
+      s.addEventListener('click',()=>{ k.stars = i; save(); renderKids(); });
+      stars.append(s);
+    }
+
+    // presence buttons
+    const present = !!state.sessions[date][k.id];
+    if(present) presentCount++;
+    const actions = document.createElement('div'); actions.className='actions';
+    const pBtn = pill(present?'Présent·e':'Absent·e', present? 'present':'absent');
+    pBtn.addEventListener('click', ()=>{ state.sessions[date][k.id]=!present; save(); renderKids(); });
+    const doneBtn = pill('✔️ Fini activité');
+    doneBtn.addEventListener('click', ()=>{ k.stars = Math.min(5,(k.stars||0)+1); toast(`+1 ⭐ pour ${k.name}`); save(); renderKids(); });
+    const colorBtn = pill('🎨 Couleur');
+    colorBtn.addEventListener('click', ()=> pickColorForKid(k));
+    const editBtn = pill('✏️ Modifier');
+    editBtn.addEventListener('click', ()=> editKid(k));
+    const delBtn = pill('🗑️ Supprimer');
+    delBtn.addEventListener('click', ()=> deleteKid(k.id));
+    actions.append(pBtn, doneBtn, colorBtn, editBtn, delBtn);
+
+    // footer
+    const foot = document.createElement('div'); foot.className='footer';
+    foot.innerHTML = `<span class="small">Étoiles: <strong>${k.stars||0}/5</strong></span>
+                      <span class="small">ID: <span class="kbd">${k.id}</span></span>`;
+
+    card.append(h, tags, stars, actions, foot);
+    list.append(card);
+  });
+
+  $('#countPresent').textContent = presentCount;
+}
+function chip(text){ const el=document.createElement('span'); el.className='tag'; el.textContent=text; return el; }
+function pill(text, extra){ const el=document.createElement('button'); el.className='pill ' + (extra||''); el.textContent=text; return el; }
+
+function reorderKid(fromId,toId){
+  const orderMap={}; state.kids.forEach((k,i)=> orderMap[k.id]=k.order??i);
+  const from = state.kids.find(k=>k.id===fromId);
+  const to = state.kids.find(k=>k.id===toId);
+  if(!from||!to) return;
+  const tmp = orderMap[from.id]; orderMap[from.id]=orderMap[to.id]; orderMap[to.id]=tmp;
+  state.kids.forEach(k=> k.order = orderMap[k.id]);
+  save(); renderKids();
+}
+
+/* ========= CRUD Élèves ========= */
+function addKidFromForm(){
+  const name = $('#kidName').value.trim();
+  if(!name){ toast('❗ Entrez un prénom'); return; }
+  const colorVal = $('#kidColor').value?.trim();
+  const kid = {
+    id: uid(), name,
+    age: parseInt($('#kidAge').value||''),
+    guardian: $('#kidGuardian').value.trim(),
+    notes: $('#kidNotes').value.trim(),
+    color: isValidHex(colorVal) ? colorVal : randColor(), // couleur choisie ou aléatoire
+    stars: 0,
+    order: (state.kids.length? Math.max(...state.kids.map(k=>k.order||0))+1 : 0),
+  };
+  state.kids.push(kid);
+  // reset form
+  $('#kidName').value=''; $('#kidAge').value=''; $('#kidGuardian').value=''; $('#kidNotes').value='';
+  $('#kidColor').value='#6c5ce7';
+  save(); renderKids();
+}
+function isValidHex(v){ return /^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v||''); }
+
+function editKid(kid){
+  const name = prompt('Nom prénom :', kid.name); if(name===null) return;
+  const age = prompt('Âge :', kid.age??''); if(age===null) return;
+  const guardian = prompt('Parent/Tuteur :', kid.guardian??''); if(guardian===null) return;
+  const notes = prompt('Notes :', kid.notes??''); if(notes===null) return;
+  const color = prompt('Couleur hex (ex: #3b82f6) :', kid.color||'#6c5ce7'); if(color===null) return;
+  kid.name=name.trim(); kid.age=parseInt(age||''); kid.guardian=guardian.trim(); kid.notes=notes.trim();
+  if(isValidHex(color)) kid.color=color.trim();
+  save(); renderKids();
+}
+function pickColorForKid(kid){
+  // crée un input color éphémère pour un choix rapide
+  const input = document.createElement('input');
+  input.type='color'; input.value = isValidHex(kid.color)?kid.color:'#6c5ce7';
+  input.style.position='fixed'; input.style.left='-1000px';
+  document.body.appendChild(input);
+  input.addEventListener('input', ()=>{ kid.color=input.value; save(); renderKids(); });
+  input.addEventListener('change', ()=>{ kid.color=input.value; save(); renderKids(); setTimeout(()=>input.remove(),0); });
+  input.click();
+}
+function deleteKid(id){
+  if(!confirm('Supprimer cet élève ?')) return;
+  state.kids = state.kids.filter(k=>k.id!==id);
+  Object.keys(state.sessions).forEach(d=> { delete state.sessions[d][id]; });
+  save(); renderKids();
+}
+
+/* ========= Présences ========= */
+function markAllPresent(){
+  const d=todayISO();
+  if(!state.sessions[d]) state.sessions[d]={};
+  state.kids.forEach(k=> state.sessions[d][k.id]=true);
+  save(); renderKids();
+}
+function clearPresence(){
+  const d=todayISO();
+  state.sessions[d]={};
+  save(); renderKids();
+}
+
+/* ========= Activités ========= */
+function renderActivities(){
+  const ul = $('#activityList'); ul.innerHTML='';
+  if(state.activities.length===0){
+    const li=document.createElement('li'); li.className='small'; li.textContent='Aucune activité – ajoutez une idée ci-dessus.';
+    ul.append(li); return;
+  }
+  state.activities.forEach(act=>{
+    const li=document.createElement('li'); li.style.display='flex'; li.style.alignItems='center'; li.style.gap='.5rem';
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.checked=!!act.done;
+    chk.addEventListener('change', ()=>{ act.done=chk.checked; save(); });
+    const span=document.createElement('span'); span.textContent=act.text; if(act.done) span.style.textDecoration='line-through';
+    const del=document.createElement('button'); del.className='pill'; del.textContent='Supprimer';
+    del.addEventListener('click', ()=>{ state.activities=state.activities.filter(a=>a.id!==act.id); save(); renderActivities(); });
+    li.append(chk, span, del); ul.append(li);
+  });
+}
+function addActivity(){
+  const text = $('#activityInput').value.trim();
+  if(!text) return;
+  state.activities.push({id:uid(), text, done:false});
+  $('#activityInput').value=''; save(); renderActivities();
+}
+
+/* ========= Minuteur ========= */
+let timer = {remain:0, handle:null, running:false};
+function startTimer(){
+  if(!timer.running){
+    if(timer.remain<=0){ timer.remain = parseInt($('#timerPreset').value||'300'); }
+    timer.running=true;
+    tick();
+  }
+}
+function pauseTimer(){ timer.running=false; if(timer.handle){ clearTimeout(timer.handle); timer.handle=null; } }
+function resetTimer(){ pauseTimer(); timer.remain=0; updateTimerUI(); }
+function tick(){
+  if(!timer.running) return;
+  updateTimerUI();
+  if(timer.remain<=0){ ding(); pauseTimer(); toast('⏱️ Terminé'); return; }
+  timer.remain--; timer.handle = setTimeout(tick,1000);
+}
+function updateTimerUI(){ $('#timerDisplay').textContent = formatTime(timer.remain); }
+function ding(){ try{ $('#beep').currentTime=0; $('#beep').play().catch(()=>{});}catch(e){} }
+
+/* ========= Export / Import / Impression ========= */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`classe-dessin-${todayISO()}.json`; a.click(); URL.revokeObjectURL(a.href);
+}
+function exportCSV(){
+  const lines = [];
+  lines.push(['date','kidId','nom','present','etoiles','age','tuteur','notes','couleur'].join(';'));
+  Object.keys(state.sessions).sort().forEach(d=>{
+    const map = state.sessions[d];
+    state.kids.forEach(k=>{
+      const present = map?.[k.id] ? '1' : '0';
+      lines.push([d,k.id,escapeCSV(k.name),present,k.stars??0,k.age??'',escapeCSV(k.guardian||''),escapeCSV(k.notes||''),k.color||''].join(';'));
+    });
+  });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`presences-${todayISO()}.csv`; a.click(); URL.revokeObjectURL(a.href);
+}
+function escapeCSV(s){ return `"${String(s).replace(/"/g,'""')}"`; }
+
+function importJSON(file){
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    try{
+      const data = JSON.parse(e.target.result);
+      if(!data.kids || !data.sessions) throw new Error('Format invalide');
+      state.kids = data.kids; state.sessions=data.sessions; state.activities=data.activities||[];
+      save(); renderKids(); renderActivities(); toast('Import réussi ✔️');
+    }catch(err){ alert('Import impossible: '+err.message); }
+  };
+  reader.readAsText(file);
+}
+function printReport(){
+  const d = todayISO();
+  const present = state.kids.filter(k=> state.sessions[d]?.[k.id]);
+  const absent = state.kids.filter(k=> !state.sessions[d]?.[k.id]);
+  const w = window.open('', '_blank');
+  w.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Rapport ${d}</title>
+  <style>body{font:14px/1.4 system-ui,Segoe UI,Roboto,sans-serif;padding:20px} h1{margin:0 0 10px}
+  table{border-collapse:collapse;width:100%} td,th{border:1px solid #ddd;padding:6px 8px} th{background:#f3f4f6; text-align:left}
+  .color{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:middle;border:1px solid #ccc}
+  .small{color:#6b7280}</style></head><body>`);
+  w.document.write(`<h1>Présences – ${d}</h1>`);
+  w.document.write(`<p class="small">Classe: Cours de dessin (tout-petits)</p>`);
+  w.document.write(`<h3>Présent·e·s (${present.length})</h3>`);
+  w.document.write(`<table><tr><th>Nom</th><th>Âge</th><th>Étoiles</th><th>Parent</th><th>Notes</th><th>Couleur</th></tr>`);
+  present.forEach(k=> w.document.write(`<tr><td>${k.name}</td><td>${k.age??''}</td><td>${k.stars??0}</td><td>${k.guardian??''}</td><td>${k.notes??''}</td><td><span class="color" style="background:${k.color||'#999'}"></span>${k.color||''}</td></tr>`));
+  w.document.write(`</table><h3>Absent·e·s (${absent.length})</h3><table><tr><th>Nom</th><th>Âge</th><th>Parent</th><th>Couleur</th></tr>`);
+  absent.forEach(k=> w.document.write(`<tr><td>${k.name}</td><td>${k.age??''}</td><td>${k.guardian??''}</td><td><span class="color" style="background:${k.color||'#999'}"></span>${k.color||''}</td></tr>`));
+  w.document.write(`</table></body></html>`); w.document.close(); w.focus(); w.print();
+}
+
+/* ========= Tirage au sort ========= */
+function pickRandom(){
+  const presentKids = state.kids.filter(k=> state.sessions[todayISO()]?.[k.id]);
+  const pool = presentKids.length ? presentKids : state.kids;
+  if(pool.length===0){ toast('Ajoutez des élèves d’abord.'); return; }
+  // petite animation
+  let i=0, rounds=18+Math.floor(Math.random()*10);
+  const target = Math.floor(Math.random()*pool.length);
+  const el = $('#pickResult');
+  const spin = setInterval(()=>{
+    el.textContent = pool[i%pool.length].name;
+    i++; if(i>rounds){ clearInterval(spin); el.textContent = '🎉 ' + pool[target].name; }
+  },90);
+}
+
+/* ========= Événements ========= */
+function bindUI(){
+  $('#today').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long', day:'2-digit', month:'long', year:'numeric'});
+  $('#addKid').addEventListener('click', addKidFromForm);
+  ['kidName','kidAge','kidGuardian','kidNotes','kidColor'].forEach(id=> {
+    $('#'+id).addEventListener('keydown', (e)=>{ if(e.key==='Enter') addKidFromForm(); });
+  });
+  $('#btnAllPresent').addEventListener('click', markAllPresent);
+  $('#btnClearPresence').addEventListener('click', clearPresence);
+  $('#btnExport').addEventListener('click', exportJSON);
+  $('#btnExportCSV').addEventListener('click', exportCSV);
+  $('#fileImport').addEventListener('change', (e)=>{ if(e.target.files?.[0]) importJSON(e.target.files[0]); e.target.value=''; });
+  $('#btnReset').addEventListener('click', ()=>{ if(confirm('Tout supprimer ?')){ localStorage.removeItem(DB_KEY); state.kids=[]; state.sessions={}; state.activities=[]; renderKids(); renderActivities(); toast('Réinitialisé'); }});
+  $('#btnPrint').addEventListener('click', printReport);
+  $('#btnPick').addEventListener('click', pickRandom);
+  $('#addActivity').addEventListener('click', addActivity);
+  $('#activityInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addActivity(); });
+
+  // Timer
+  $('#timerStart').addEventListener('click', ()=>{ if(timer.remain<=0) timer.remain=parseInt($('#timerPreset').value); startTimer(); });
+  $('#timerPause').addEventListener('click', pauseTimer);
+  $('#timerReset').addEventListener('click', resetTimer);
+}
+
+/* ========= Bootstrap ========= */
+load();
+bindUI();
+renderKids();
+renderActivities();
+</script>
+</body>
+</html>
