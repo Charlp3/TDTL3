@@ -2,27 +2,30 @@
 <html lang="fr" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>TDTL v2.x</title>
+  <title>TDTL v2.2</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0a84ff" />
   <style>
     :root{
-      --upper:#d9dae0; --page:#e5e5ea; --panel:#ffffff;
-      --ink:#111; --sub:#555; --border:#c7c8ce; --accent:#007aff;
+      /* ✅ gris assombris */
+      --upper:#c7c8ce; --page:#d1d2d8; --panel:#ffffff;
+      --ink:#111; --sub:#444; --border:#b1b2b8; --accent:#007aff;
       --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
-      --head-dark:#3a3a3c;
+      --head-dark:#2a2a2c;
       --fab-h:60px;
       --sheet-bg:#ffffff; --sheet-text:#111;
       --table-head-text:#f2f2f7;
       --toast-bg:#111; --toast-fg:#fff;
+      --zebra1:#e0e1e6; --zebra2:#d4d5db; /* zébrage plus foncé */
     }
     @media (prefers-color-scheme: dark){
       :root{
-        --upper:#1c1c1e; --page:#111113; --panel:#1a1a1d;
+        --upper:#1b1b1e; --page:#111113; --panel:#1a1a1d;
         --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
         --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
         --head-dark:#1f1f22; --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
         --toast-bg:#0b0b0d; --toast-fg:#fff;
+        --zebra1:#2c2c2e; --zebra2:#3a3a3c;
       }
     }
 
@@ -39,43 +42,49 @@
     .wrap{max-width:1100px;margin:0 auto;padding:12px 12px calc(var(--fab-h) + 16px)}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 
-    /* Première ligne = actions + stats */
-    .toolbar{display:flex;gap:8px;padding:8px;align-items:center;justify-content:flex-start;flex-wrap:wrap;
+    /* 1ère ligne : actions + stats */
+    .toolbar{display:flex;gap:8px;padding:8px;align-items:center;flex-wrap:wrap;
              background:var(--upper);border-bottom:1px solid var(--border)}
-    .btn{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:.9rem;font-weight:600;cursor:pointer}
+    .btn{height:34px;padding:0 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:.88rem;font-weight:600;cursor:pointer}
     .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
     .stat{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px;font-weight:600}
 
-    /* Formulaire d'ajout (sans Montant/Présent) */
-    form.add{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)}
-    label{font-size:.8rem;color:var(--sub);margin:0 0 4px}
-    input{width:100%;height:40px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem}
+    /* Formulaire d'ajout (Nom/Prénom/Tel/Mail) */
+    form.add{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)}
+    label{font-size:.78rem;color:var(--sub);margin:0 0 4px}
+    input{width:100%;height:38px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem}
 
-    /* Liste zébrée */
+    /* Liste zébrée + colonnes compactes */
     .tblWrap{max-height:60svh;overflow:auto}
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
-    thead th{position:sticky;top:0;z-index:30;padding:8px;text-align:left;font-size:.8rem;color:var(--table-head-text);background:var(--head-dark)}
-    tbody td{padding:10px;border-bottom:1px solid var(--border);font-size:.95rem}
-    tbody tr:nth-child(odd){background:#f3f3f6}
-    tbody tr:nth-child(even){background:#e6e6eb}
-    @media (prefers-color-scheme: dark){
-      tbody tr:nth-child(odd){background:#2c2c2e}
-      tbody tr:nth-child(even){background:#3a3a3c}
-    }
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:640px} /* ✅ plus étroit */
+    thead th{position:sticky;top:0;z-index:30;padding:7px 8px;text-align:left;font-size:.78rem;color:var(--table-head-text);background:var(--head-dark)}
+    tbody td{padding:8px 8px;border-bottom:1px solid var(--border);font-size:.92rem}
+    tbody tr:nth-child(odd){background:var(--zebra1)}
+    tbody tr:nth-child(even){background:var(--zebra2)}
+
+    .col-name{min-width:220px}
+    .col-pres{width:76px}     /* ✅ plus étroit */
+    .col-money{width:96px}    /* ✅ plus étroit */
+    .col-actions{width:112px} /* ✅ plus étroit */
+    .th-tel{width:110px}
+    .th-mail{width:160px}
 
     .nameCell{display:flex;align-items:center;gap:10px;cursor:pointer}
-    .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.1)}
+    .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
     .nameBadge.green{background:#28cd41;border-color:#1e9731}
     .nameBadge.red{background:#ff3b30;border-color:#d62a21}
     .nameBadge.yellow{background:#ffcc00;border-color:#e0b500}
 
-    .presentCell input{transform:scale(1.15)}
-    .money input{max-width:110px}
-    .hiddenCol{display:none}
-    .rowActions{display:flex;gap:8px;align-items:center}
+    /* ✅ cases à cocher plus petites */
+    .presentCell input[type="checkbox"]{transform:scale(.9);}
 
-    /* Barre basse (plus de “Supprimer”) */
-    .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(250,250,252,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
+    .money input{max-width:90px}
+    .hiddenCol{display:none}
+    .rowActions{display:flex;gap:6px;align-items:center}
+    .rowActions .btn{height:30px;padding:0 8px;font-size:.8rem;border-radius:8px}
+
+    /* Barre basse */
+    .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(245,245,247,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
             padding:8px;display:flex;gap:8px}
     .fabBar .btn{flex:1}
 
@@ -94,7 +103,7 @@
 </head>
 <body>
   <header>
-    <h1>TDTL <span class="version" id="version">v2.x</span></h1>
+    <h1>TDTL <span class="version" id="version">v2.2</span></h1>
   </header>
 
   <div class="wrap">
@@ -108,7 +117,7 @@
         <span class="stat">Total: <strong id="statTotal">0,00 €</strong></span>
       </div>
 
-      <!-- Formulaire d'ajout (Nom/Prénom/Tel/Mail) -->
+      <!-- Formulaire d'ajout -->
       <form class="add" id="addForm" novalidate>
         <div><label>Prénom</label><input id="prenom" required autocomplete="given-name" placeholder="Jean"></div>
         <div><label>Nom</label><input id="nom" required autocomplete="family-name" placeholder="Dupont"></div>
@@ -122,12 +131,12 @@
         <table id="tbl">
           <thead>
             <tr>
-              <th>Nom & Prénom</th>
+              <th class="col-name">Nom & Prénom</th>
               <th class="th-tel">Téléphone</th>
               <th class="th-mail">E-mail</th>
-              <th class="presentCell">Présent</th>
-              <th>Montant (€)</th>
-              <th style="width:140px">Actions</th>
+              <th class="presentCell col-pres">Présent</th>
+              <th class="col-money">Montant (€)</th>
+              <th class="col-actions">Actions</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -138,7 +147,7 @@
     </div>
   </div>
 
-  <!-- Barre basse (plus simple) -->
+  <!-- Barre basse -->
   <div class="fabBar">
     <button class="btn" id="exportNamesAmounts">Exporter</button>
     <button class="btn primary" id="saveAll">Sauver</button>
@@ -190,19 +199,20 @@
   <div id="toast" class="toast">✔️</div>
 
 <script>
-/* ===== Version ===== */
-const VERSION = '2.1'; // ⬅️ change juste cette chaîne
+/* ===== Version / stockage ===== */
+const VERSION = '2.2';
 document.getElementById('version').textContent = 'v' + VERSION;
+const STORAGE_KEY = 'tdtl_v_' + VERSION.replaceAll('.','_');
 
 /* ===== Helpers & état ===== */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const fmt = n => (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
-const STORAGE_KEY = 'tdtl_v' + VERSION.replaceAll('.','_');
 const phoneValid = v => !v || /^04\d{8}$/.test(String(v||'').trim());
 const emailValid = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim());
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 
+/* ===== Données ===== */
 let state = loadState();
 function loadState(){
   try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
@@ -215,6 +225,18 @@ function loadState(){
   };
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+/* ===== Tri alphabétique (Nom puis Prénom) ===== */
+const normalize = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function sortPlayers(){
+  state.players.sort((a,b)=>{
+    const an=normalize(a.nom||''), bn=normalize(b.nom||'');
+    if(an<bn) return -1; if(an>bn) return 1;
+    const ap=normalize(a.prenom||''), bp=normalize(b.prenom||'');
+    if(ap<bp) return -1; if(ap>bp) return 1;
+    return 0;
+  });
+}
 
 /* ===== Rendu ===== */
 function badgeClass(p){
@@ -235,50 +257,46 @@ function render(){
   const tbody = $('#tbody'); tbody.textContent='';
   if(state.players.length===0) $('#empty').style.display='block'; else $('#empty').style.display='none';
 
-  for(const p of state.players){
+  state.players.forEach(p=>{
     const tr = document.createElement('tr');
 
-    // Nom & Prénom (clic -> fiche)
-    const tdName = document.createElement('td');
+    // Nom & Prénom
+    const tdName = document.createElement('td'); tdName.className='col-name';
     const nameBox = document.createElement('div'); nameBox.className='nameCell'; nameBox.title='Éditer';
     const badge = document.createElement('span'); badge.className='nameBadge ' + badgeClass(p);
     const nameText = document.createElement('span'); nameText.textContent = `${p.nom.toUpperCase()} ${p.prenom}`;
     nameBox.append(badge, nameText); tdName.appendChild(nameBox); tr.appendChild(tdName);
     nameBox.addEventListener('click', ()=> openRowSheet(p.id));
 
-    // Tel (masqué par défaut)
-    const tdTel = document.createElement('td'); tdTel.className = state.hideTel ? 'hiddenCol' : '';
-    tdTel.textContent = p.tel || '—'; tr.appendChild(tdTel);
+    // Tel / Mail
+    const tdTel = document.createElement('td'); tdTel.className = state.hideTel ? 'hiddenCol th-tel' : 'th-tel';  tdTel.textContent  = p.tel  || '—'; tr.appendChild(tdTel);
+    const tdMail= document.createElement('td'); tdMail.className= state.hideMail? 'hiddenCol th-mail' : 'th-mail'; tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
 
-    // Mail (masqué par défaut)
-    const tdMail = document.createElement('td'); tdMail.className = state.hideMail ? 'hiddenCol' : '';
-    tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
-
-    // Présent
-    const tdPres = document.createElement('td'); tdPres.className='presentCell';
+    // Présent (checkbox plus petite)
+    const tdPres = document.createElement('td'); tdPres.className='presentCell col-pres';
     const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=!!p.present;
     cb.addEventListener('change', ()=>{ p.present=cb.checked; save(); render(); });
     tdPres.appendChild(cb); tr.appendChild(tdPres);
 
     // Montant
-    const tdMoney = document.createElement('td');
-    const m = document.createElement('input'); m.type='number'; m.inputMode='decimal'; m.min='0'; m.step='0.01'; m.style.maxWidth='110px';
+    const tdMoney = document.createElement('td'); tdMoney.className='col-money';
+    const m = document.createElement('input'); m.type='number'; m.inputMode='decimal'; m.min='0'; m.step='0.01'; m.style.maxWidth='86px';
     m.value = (p.montant===null || typeof p.montant==='undefined') ? '' : String(p.montant);
     m.addEventListener('input', ()=>{ const v=m.value.trim(); p.montant = v==='' ? null : Number(v); save(); render(); });
     tdMoney.appendChild(m); tr.appendChild(tdMoney);
 
     // Actions
-    const tdAct = document.createElement('td'); tdAct.className='rowActions';
+    const tdAct = document.createElement('td'); tdAct.className='rowActions col-actions';
     const edit = document.createElement('button'); edit.className='btn'; edit.textContent='✎'; edit.onclick=()=>openRowSheet(p.id);
     const del  = document.createElement('button'); del.className='btn'; del.style.cssText='background:#fff0f0;color:#b10000;border-color:#ffd1d1';
-    del.textContent='Supprimer';
+    del.textContent='Suppr';
     del.onclick=()=>{ if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){ state.players = state.players.filter(x=>x.id!==p.id); save(); render(); } };
     tdAct.append(edit, del); tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
-  }
+  });
 
-  // Stats dans la 1ère ligne
+  // Stats
   const presents = state.players.filter(p=>p.present);
   const total = presents.reduce((s,p)=> s + (Number(p.montant)>0 ? Number(p.montant) : 0), 0);
   $('#statPresents').textContent = String(presents.length);
@@ -309,7 +327,8 @@ $('#rowSave').addEventListener('click', ()=>{
   if(!nom || !prenom){ alert('Nom et prénom requis.'); return; }
   if(!phoneValid(tel)){ alert('Téléphone invalide : 04 + 8 chiffres.'); return; }
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
-  p.nom = nom; p.prenom = prenom; p.tel = tel; p.mail = mail; save(); render(); toast('Modifié ✔️'); closeRowSheet();
+  p.nom = nom; p.prenom = prenom; p.tel = tel; p.mail = mail;
+  sortPlayers(); save(); render(); toast('Modifié ✔️'); closeRowSheet(); /* ✅ tri aussi après édition */
 });
 $('#rowDelete').addEventListener('click', ()=>{
   if(!currentRowId) return;
@@ -329,7 +348,8 @@ $('#addForm').addEventListener('submit', (e)=>{
   if(!prenom || !nom){ alert('Nom et prénom requis.'); return; }
   if(!phoneValid(tel)){ alert('Téléphone invalide : 04 + 8 chiffres.'); return; }
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
-  state.players.unshift({ id:crypto.randomUUID(), prenom, nom, tel, mail, present:false, montant:null });
+  state.players.push({ id:crypto.randomUUID(), prenom, nom, tel, mail, present:false, montant:null });
+  sortPlayers(); /* ✅ tri automatique dès l’ajout */
   save(); e.target.reset(); render(); toast('Ajouté ✔️');
 });
 
@@ -406,6 +426,7 @@ async function doImportCsv(file, mode='append'){
     }
     if(valid.length===0){ alert('Aucune ligne valide.'); return; }
     state.players = (mode==='replace') ? valid : valid.concat(state.players);
+    sortPlayers(); /* ✅ tri aussi après import */
     save(); render(); toast(`Importé ${valid.length} ✔️`);
   }catch(err){ console.error(err); alert('Erreur import : '+(err?.message||err)); }
 }
@@ -470,7 +491,7 @@ function mapCsvRows(rows){
 }
 
 /* ===== Init ===== */
-render();
+sortPlayers(); render();
 </script>
 </body>
 </html>
