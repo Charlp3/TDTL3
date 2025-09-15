@@ -2,7 +2,7 @@
 <html lang="fr" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>TDTL v2.0</title>
+  <title>TDTL v2.x</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0a84ff" />
   <style>
@@ -30,7 +30,7 @@
     body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
          background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%)}
 
-    /* Header */
+    /* Header ultra-compact */
     header{position:sticky;top:0;z-index:40;background:var(--upper);border-bottom:1px solid var(--border);
            padding:calc(4px + env(safe-area-inset-top)) 12px 4px}
     h1{margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
@@ -39,29 +39,21 @@
     .wrap{max-width:1100px;margin:0 auto;padding:12px 12px calc(var(--fab-h) + 16px)}
     .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 
-    /* Panneau supérieur */
+    /* Première ligne = actions + stats */
     .toolbar{display:flex;gap:8px;padding:8px;align-items:center;justify-content:flex-start;flex-wrap:wrap;
              background:var(--upper);border-bottom:1px solid var(--border)}
     .btn{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:.9rem;font-weight:600;cursor:pointer}
     .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
-    .btn.danger{background:#fff0f0;color:#b10000;border-color:#ffd1d1}
+    .stat{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px;font-weight:600}
 
-    .displayBar{display:flex;gap:10px;align-items:center;padding:6px 8px;background:var(--upper);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.95rem}
-    .pill{background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px}
-
-    /* Formulaire d'ajout (sans montant ni présent) */
-    form.add{
-      display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)
-    }
+    /* Formulaire d'ajout (sans Montant/Présent) */
+    form.add{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)}
     label{font-size:.8rem;color:var(--sub);margin:0 0 4px}
-    input,select{
-      width:100%;height:40px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem
-    }
-    .full{grid-column:1/-1}
+    input{width:100%;height:40px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem}
 
     /* Liste zébrée */
     .tblWrap{max-height:60svh;overflow:auto}
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
     thead th{position:sticky;top:0;z-index:30;padding:8px;text-align:left;font-size:.8rem;color:var(--table-head-text);background:var(--head-dark)}
     tbody td{padding:10px;border-bottom:1px solid var(--border);font-size:.95rem}
     tbody tr:nth-child(odd){background:#f3f3f6}
@@ -82,7 +74,7 @@
     .hiddenCol{display:none}
     .rowActions{display:flex;gap:8px;align-items:center}
 
-    /* Barre basse */
+    /* Barre basse (plus de “Supprimer”) */
     .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(250,250,252,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
             padding:8px;display:flex;gap:8px}
     .fabBar .btn{flex:1}
@@ -102,24 +94,21 @@
 </head>
 <body>
   <header>
-    <h1>TDTL <span class="version">v2.0</span></h1>
+    <h1>TDTL <span class="version" id="version">v2.x</span></h1>
   </header>
 
   <div class="wrap">
     <div class="card">
 
-      <!-- Panneau supérieur minimal -->
+      <!-- 1ère ligne : actions + stats -->
       <div class="toolbar">
         <button class="btn" id="btnImport">Importer</button>
         <button class="btn" id="btnOptions">Options</button>
+        <span class="stat">Présents: <strong id="statPresents">0</strong></span>
+        <span class="stat">Total: <strong id="statTotal">0,00 €</strong></span>
       </div>
 
-      <div class="displayBar">
-        <span class="pill">Présents: <strong id="statPresents">0</strong></span>
-        <span class="pill">Total: <strong id="statTotal">0,00 €</strong></span>
-      </div>
-
-      <!-- Formulaire d'ajout (Sans Montant & Présent) -->
+      <!-- Formulaire d'ajout (Nom/Prénom/Tel/Mail) -->
       <form class="add" id="addForm" novalidate>
         <div><label>Prénom</label><input id="prenom" required autocomplete="given-name" placeholder="Jean"></div>
         <div><label>Nom</label><input id="nom" required autocomplete="family-name" placeholder="Dupont"></div>
@@ -133,7 +122,6 @@
         <table id="tbl">
           <thead>
             <tr>
-              <th style="width:40px"><input type="checkbox" id="selectAll"></th>
               <th>Nom & Prénom</th>
               <th class="th-tel">Téléphone</th>
               <th class="th-mail">E-mail</th>
@@ -150,9 +138,8 @@
     </div>
   </div>
 
-  <!-- Barre basse -->
+  <!-- Barre basse (plus simple) -->
   <div class="fabBar">
-    <button class="btn danger" id="deleteSelected">Supprimer</button>
     <button class="btn" id="exportNamesAmounts">Exporter</button>
     <button class="btn primary" id="saveAll">Sauver</button>
   </div>
@@ -194,20 +181,24 @@
     <div class="row"><label>Tel</label><input id="rowTel" maxlength="10" inputmode="numeric" placeholder="04XXXXXXXX"></div>
     <div class="row"><label>Mail</label><input id="rowMail" type="email" placeholder="ex: joueur@mail.fr"></div>
     <div class="actions">
-      <button class="btn danger" id="rowDelete">Supprimer</button>
       <button class="btn" id="rowCancel">Annuler</button>
       <button class="btn primary" id="rowSave">Enregistrer</button>
+      <button class="btn" style="background:#fff0f0;color:#b10000;border-color:#ffd1d1" id="rowDelete">Supprimer</button>
     </div>
   </div>
 
   <div id="toast" class="toast">✔️</div>
 
 <script>
+/* ===== Version ===== */
+const VERSION = '2.1'; // ⬅️ change juste cette chaîne
+document.getElementById('version').textContent = 'v' + VERSION;
+
 /* ===== Helpers & état ===== */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const fmt = n => (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
-const STORAGE_KEY = 'tdtl_v20_form_slim';
+const STORAGE_KEY = 'tdtl_v' + VERSION.replaceAll('.','_');
 const phoneValid = v => !v || /^04\d{8}$/.test(String(v||'').trim());
 const emailValid = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim());
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
@@ -220,8 +211,7 @@ function loadState(){
       {id:crypto.randomUUID(), prenom:'Pierre', nom:'CHARLIER', tel:'0412345678', mail:'', present:true,  montant:1},
       {id:crypto.randomUUID(), prenom:'Coco',   nom:'CICI',      tel:'',          mail:'', present:true,  montant:0},
     ],
-    hideTel:true,   // ✅ masqué par défaut
-    hideMail:true   // ✅ masqué par défaut
+    hideTel:true, hideMail:true
   };
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -247,11 +237,6 @@ function render(){
 
   for(const p of state.players){
     const tr = document.createElement('tr');
-
-    // Sélecteur
-    const tdSel = document.createElement('td');
-    tdSel.innerHTML = `<input type="checkbox" class="rowSel" data-id="${p.id}">`;
-    tr.appendChild(tdSel);
 
     // Nom & Prénom (clic -> fiche)
     const tdName = document.createElement('td');
@@ -285,21 +270,19 @@ function render(){
     // Actions
     const tdAct = document.createElement('td'); tdAct.className='rowActions';
     const edit = document.createElement('button'); edit.className='btn'; edit.textContent='✎'; edit.onclick=()=>openRowSheet(p.id);
-    const del  = document.createElement('button'); del.className='btn danger'; del.textContent='Suppr';
+    const del  = document.createElement('button'); del.className='btn'; del.style.cssText='background:#fff0f0;color:#b10000;border-color:#ffd1d1';
+    del.textContent='Supprimer';
     del.onclick=()=>{ if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){ state.players = state.players.filter(x=>x.id!==p.id); save(); render(); } };
     tdAct.append(edit, del); tr.appendChild(tdAct);
 
     tbody.appendChild(tr);
   }
 
-  // Stats
+  // Stats dans la 1ère ligne
   const presents = state.players.filter(p=>p.present);
   const total = presents.reduce((s,p)=> s + (Number(p.montant)>0 ? Number(p.montant) : 0), 0);
   $('#statPresents').textContent = String(presents.length);
   $('#statTotal').textContent = fmt(total)+' €';
-
-  // Reset selectAll
-  $('#selectAll').checked=false;
 }
 
 /* ===== Sheet ligne ===== */
@@ -336,7 +319,7 @@ $('#rowDelete').addEventListener('click', ()=>{
   }
 });
 
-/* ===== Ajout / suppression / export ===== */
+/* ===== Ajout / export / options / import ===== */
 $('#addForm').addEventListener('submit', (e)=>{
   e.preventDefault();
   const prenom = $('#prenom').value.trim();
@@ -348,15 +331,6 @@ $('#addForm').addEventListener('submit', (e)=>{
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
   state.players.unshift({ id:crypto.randomUUID(), prenom, nom, tel, mail, present:false, montant:null });
   save(); e.target.reset(); render(); toast('Ajouté ✔️');
-});
-
-$('#selectAll').addEventListener('change', e=> $$('.rowSel').forEach(cb=> cb.checked=e.target.checked));
-$('#deleteSelected').addEventListener('click', ()=>{
-  const ids = $$('.rowSel:checked').map(cb=>cb.dataset.id);
-  if(!ids.length){ alert('Sélectionnez au moins un membre.'); return; }
-  if(confirm(`Supprimer ${ids.length} membre(s) ?`)){
-    state.players = state.players.filter(p=>!ids.includes(p.id)); save(); render(); toast('Supprimé ✔️');
-  }
 });
 
 $('#saveAll').addEventListener('click', ()=>{ save(); toast('Sauvegardé ✔️'); });
@@ -388,8 +362,8 @@ function downloadCsv(content, filename){
 const optSheet = $('#sheetOptions');
 $('#btnOptions').addEventListener('click', ()=>{ optSheet.classList.add('show'); optSheet.setAttribute('aria-hidden','false'); });
 $('#closeOptions').addEventListener('click', ()=>{ optSheet.classList.remove('show'); optSheet.setAttribute('aria-hidden','true'); });
-
 $('#btnImport').addEventListener('click', ()=>{ optSheet.classList.add('show'); optSheet.setAttribute('aria-hidden','false'); $('#csvFile').focus(); });
+
 $('#toggleTel').addEventListener('click', ()=>{ state.hideTel=!state.hideTel; save(); render(); });
 $('#toggleMail').addEventListener('click', ()=>{ state.hideMail=!state.hideMail; save(); render(); });
 
@@ -426,7 +400,7 @@ async function doImportCsv(file, mode='append'){
       const present= !!r.present;
       const montant= (r.montant==='' || r.montant===null || typeof r.montant==='undefined') ? null : Number(r.montant);
       if(!prenom || !nom) continue;
-      if(!phoneValid(tel)) continue; // vide OU 04xxxxxxxx
+      if(!phoneValid(tel)) continue;
       if(!emailValid(mail)) continue;
       valid.push({ id:crypto.randomUUID(), prenom, nom, tel, mail, present, montant });
     }
