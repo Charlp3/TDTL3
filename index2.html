@@ -2,38 +2,37 @@
 <html lang="fr" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>TDTL v2.2</title>
+  <title>TDTL v2.4</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0a84ff" />
   <style>
     :root{
-      /* ✅ gris assombris */
+      /* Gris assombris */
       --upper:#c7c8ce; --page:#d1d2d8; --panel:#ffffff;
       --ink:#111; --sub:#444; --border:#b1b2b8; --accent:#007aff;
       --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
       --head-dark:#2a2a2c;
+      --zebra1:#e0e1e6; --zebra2:#d4d5db;
       --fab-h:60px;
-      --sheet-bg:#ffffff; --sheet-text:#111;
-      --table-head-text:#f2f2f7;
-      --toast-bg:#111; --toast-fg:#fff;
-      --zebra1:#e0e1e6; --zebra2:#d4d5db; /* zébrage plus foncé */
     }
     @media (prefers-color-scheme: dark){
       :root{
         --upper:#1b1b1e; --page:#111113; --panel:#1a1a1d;
         --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
         --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
-        --head-dark:#1f1f22; --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
-        --toast-bg:#0b0b0d; --toast-fg:#fff;
+        --head-dark:#1f1f22;
         --zebra1:#2c2c2e; --zebra2:#3a3a3c;
       }
     }
 
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
-         background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%)}
+    body{
+      margin:0;color:var(--ink);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+      background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%);
+    }
 
-    /* Header ultra-compact */
+    /* Header */
     header{position:sticky;top:0;z-index:40;background:var(--upper);border-bottom:1px solid var(--border);
            padding:calc(4px + env(safe-area-inset-top)) 12px 4px}
     h1{margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
@@ -49,39 +48,37 @@
     .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
     .stat{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px;font-weight:600}
 
-    /* Formulaire d'ajout (Nom/Prénom/Tel/Mail) */
+    /* Formulaire d'ajout compact */
     form.add{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:8px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)}
     label{font-size:.78rem;color:var(--sub);margin:0 0 4px}
     input{width:100%;height:38px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem}
 
-    /* Liste zébrée + colonnes compactes */
+    /* Table compacte */
     .tblWrap{max-height:60svh;overflow:auto}
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:640px} /* ✅ plus étroit */
-    thead th{position:sticky;top:0;z-index:30;padding:7px 8px;text-align:left;font-size:.78rem;color:var(--table-head-text);background:var(--head-dark)}
-    tbody td{padding:8px 8px;border-bottom:1px solid var(--border);font-size:.92rem}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:520px} /* étroit pour iPhone */
+    thead th{position:sticky;top:0;padding:6px 8px;text-align:left;font-size:.75rem;color:#f2f2f7;background:var(--head-dark)}
+    tbody td{padding:6px 8px;border-bottom:1px solid var(--border);font-size:.9rem}
     tbody tr:nth-child(odd){background:var(--zebra1)}
     tbody tr:nth-child(even){background:var(--zebra2)}
-
-    .col-name{min-width:220px}
-    .col-pres{width:76px}     /* ✅ plus étroit */
-    .col-money{width:96px}    /* ✅ plus étroit */
-    .col-actions{width:112px} /* ✅ plus étroit */
-    .th-tel{width:110px}
-    .th-mail{width:160px}
-
-    .nameCell{display:flex;align-items:center;gap:10px;cursor:pointer}
-    .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
-    .nameBadge.green{background:#28cd41;border-color:#1e9731}
-    .nameBadge.red{background:#ff3b30;border-color:#d62a21}
-    .nameBadge.yellow{background:#ffcc00;border-color:#e0b500}
-
-    /* ✅ cases à cocher plus petites */
-    .presentCell input[type="checkbox"]{transform:scale(.9);}
-
-    .money input{max-width:90px}
     .hiddenCol{display:none}
-    .rowActions{display:flex;gap:6px;align-items:center}
-    .rowActions .btn{height:30px;padding:0 8px;font-size:.8rem;border-radius:8px}
+
+    /* Largeurs resserrées */
+    .col-name{min-width:150px;max-width:210px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .th-tel{width:100px}
+    .th-mail{width:140px}
+    .col-pres{width:64px;text-align:center}
+    .col-money{width:86px}
+    .col-actions{width:96px}
+
+    .nameCell{display:flex;align-items:center;gap:6px;cursor:pointer}
+    .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+    .nameBadge.green{background:#28cd41}.nameBadge.red{background:#ff3b30}.nameBadge.yellow{background:#ffcc00}
+
+    /* Cases à cocher plus petites */
+    .presentCell input[type="checkbox"]{transform:scale(.85)}
+
+    .rowActions{display:flex;gap:4px}
+    .rowActions .btn{height:28px;padding:0 6px;font-size:.75rem;border-radius:8px}
 
     /* Barre basse */
     .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(245,245,247,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
@@ -89,21 +86,21 @@
     .fabBar .btn{flex:1}
 
     /* Sheets */
-    .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sheet-bg);color:var(--sheet-text);
+    .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;color:#111;
            border-radius:12px 12px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);transform:translateY(100%);transition:.25s;padding:12px;max-height:70svh;overflow:auto}
     .sheet.show{transform:translateY(0)}
     .sheet h3{margin:0 0 10px}
     .sheet .row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:10px}
     .sheet .actions{display:flex;gap:10px;justify-content:flex-end}
 
-    .toast{position:fixed;bottom:calc(var(--fab-h) + 12px);right:16px;background:var(--toast-bg);color:var(--toast-fg);
+    .toast{position:fixed;bottom:calc(var(--fab-h) + 12px);right:16px;background:#111;color:#fff;
            padding:8px 12px;border-radius:8px;opacity:0;transition:.25s}
     .toast.show{opacity:1}
   </style>
 </head>
 <body>
   <header>
-    <h1>TDTL <span class="version" id="version">v2.2</span></h1>
+    <h1>TDTL <span class="version" id="version">v2.4</span></h1>
   </header>
 
   <div class="wrap">
@@ -113,11 +110,12 @@
       <div class="toolbar">
         <button class="btn" id="btnImport">Importer</button>
         <button class="btn" id="btnOptions">Options</button>
+        <span class="stat">Inscrits: <strong id="statInscrits">0</strong></span>
         <span class="stat">Présents: <strong id="statPresents">0</strong></span>
         <span class="stat">Total: <strong id="statTotal">0,00 €</strong></span>
       </div>
 
-      <!-- Formulaire d'ajout -->
+      <!-- Formulaire d'ajout (sans présent/montant) -->
       <form class="add" id="addForm" novalidate>
         <div><label>Prénom</label><input id="prenom" required autocomplete="given-name" placeholder="Jean"></div>
         <div><label>Nom</label><input id="nom" required autocomplete="family-name" placeholder="Dupont"></div>
@@ -136,7 +134,7 @@
               <th class="th-mail">E-mail</th>
               <th class="presentCell col-pres">Présent</th>
               <th class="col-money">Montant (€)</th>
-              <th class="col-actions">Actions</th>
+              <th class="col-actions th-actions">Actions</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -164,6 +162,10 @@
       <label>Colonne E-mail</label>
       <button class="btn" id="toggleMail">Afficher</button>
     </div>
+    <div class="row">
+      <label>Colonne Actions</label>
+      <button class="btn" id="toggleActions">Afficher</button>
+    </div>
     <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
     <div class="row">
       <label>Fichier CSV</label>
@@ -182,7 +184,7 @@
     </div>
   </div>
 
-  <!-- Sheet Édition ligne -->
+  <!-- Sheet Édition -->
   <div id="sheetRow" class="sheet" aria-hidden="true">
     <h3 id="rowTitle">Édition</h3>
     <div class="row"><label>Nom</label><input id="rowNom"></div>
@@ -200,11 +202,11 @@
 
 <script>
 /* ===== Version / stockage ===== */
-const VERSION = '2.2';
+const VERSION = '2.4';
 document.getElementById('version').textContent = 'v' + VERSION;
 const STORAGE_KEY = 'tdtl_v_' + VERSION.replaceAll('.','_');
 
-/* ===== Helpers & état ===== */
+/* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const fmt = n => (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
@@ -212,7 +214,7 @@ const phoneValid = v => !v || /^04\d{8}$/.test(String(v||'').trim());
 const emailValid = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim());
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 
-/* ===== Données ===== */
+/* ===== État ===== */
 let state = loadState();
 function loadState(){
   try{ const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
@@ -221,18 +223,20 @@ function loadState(){
       {id:crypto.randomUUID(), prenom:'Pierre', nom:'CHARLIER', tel:'0412345678', mail:'', present:true,  montant:1},
       {id:crypto.randomUUID(), prenom:'Coco',   nom:'CICI',      tel:'',          mail:'', present:true,  montant:0},
     ],
-    hideTel:true, hideMail:true
+    hideTel:true,
+    hideMail:true,
+    hideActions:true  // ✅ Actions masquées par défaut
   };
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
-/* ===== Tri alphabétique (Nom puis Prénom) ===== */
-const normalize = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+/* ===== Tri alphabétique (Nom, Prénom) ===== */
+const normalize = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 function sortPlayers(){
   state.players.sort((a,b)=>{
-    const an=normalize(a.nom||''), bn=normalize(b.nom||'');
+    const an=normalize(a.nom), bn=normalize(b.nom);
     if(an<bn) return -1; if(an>bn) return 1;
-    const ap=normalize(a.prenom||''), bp=normalize(b.prenom||'');
+    const ap=normalize(a.prenom), bp=normalize(b.prenom);
     if(ap<bp) return -1; if(ap>bp) return 1;
     return 0;
   });
@@ -248,11 +252,14 @@ function badgeClass(p){
   return '';
 }
 function render(){
-  // options UI
-  $('#toggleTel').textContent  = state.hideTel  ? 'Afficher' : 'Masquer';
-  $('#toggleMail').textContent = state.hideMail ? 'Afficher' : 'Masquer';
+  // toggles d'options
+  $('#toggleTel').textContent      = state.hideTel      ? 'Afficher' : 'Masquer';
+  $('#toggleMail').textContent     = state.hideMail     ? 'Afficher' : 'Masquer';
+  $('#toggleActions').textContent  = state.hideActions  ? 'Afficher' : 'Masquer';
+
   $('.th-tel')?.classList.toggle('hiddenCol', state.hideTel);
   $('.th-mail')?.classList.toggle('hiddenCol', state.hideMail);
+  $('.th-actions')?.classList.toggle('hiddenCol', state.hideActions);
 
   const tbody = $('#tbody'); tbody.textContent='';
   if(state.players.length===0) $('#empty').style.display='block'; else $('#empty').style.display='none';
@@ -269,10 +276,13 @@ function render(){
     nameBox.addEventListener('click', ()=> openRowSheet(p.id));
 
     // Tel / Mail
-    const tdTel = document.createElement('td'); tdTel.className = state.hideTel ? 'hiddenCol th-tel' : 'th-tel';  tdTel.textContent  = p.tel  || '—'; tr.appendChild(tdTel);
-    const tdMail= document.createElement('td'); tdMail.className= state.hideMail? 'hiddenCol th-mail' : 'th-mail'; tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
+    const tdTel = document.createElement('td'); tdTel.className = (state.hideTel ? 'hiddenCol ' : '') + 'th-tel';
+    tdTel.textContent = p.tel || '—'; tr.appendChild(tdTel);
 
-    // Présent (checkbox plus petite)
+    const tdMail= document.createElement('td'); tdMail.className = (state.hideMail ? 'hiddenCol ' : '') + 'th-mail';
+    tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
+
+    // Présent
     const tdPres = document.createElement('td'); tdPres.className='presentCell col-pres';
     const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=!!p.present;
     cb.addEventListener('change', ()=>{ p.present=cb.checked; save(); render(); });
@@ -285,8 +295,8 @@ function render(){
     m.addEventListener('input', ()=>{ const v=m.value.trim(); p.montant = v==='' ? null : Number(v); save(); render(); });
     tdMoney.appendChild(m); tr.appendChild(tdMoney);
 
-    // Actions
-    const tdAct = document.createElement('td'); tdAct.className='rowActions col-actions';
+    // Actions (optionnel)
+    const tdAct = document.createElement('td'); tdAct.className='rowActions col-actions ' + (state.hideActions ? 'hiddenCol' : '');
     const edit = document.createElement('button'); edit.className='btn'; edit.textContent='✎'; edit.onclick=()=>openRowSheet(p.id);
     const del  = document.createElement('button'); del.className='btn'; del.style.cssText='background:#fff0f0;color:#b10000;border-color:#ffd1d1';
     del.textContent='Suppr';
@@ -297,9 +307,11 @@ function render(){
   });
 
   // Stats
-  const presents = state.players.filter(p=>p.present);
-  const total = presents.reduce((s,p)=> s + (Number(p.montant)>0 ? Number(p.montant) : 0), 0);
-  $('#statPresents').textContent = String(presents.length);
+  const inscrits = state.players.length;
+  const presents = state.players.filter(p=>p.present).length;
+  const total = state.players.reduce((s,p)=> s + (p.present && Number(p.montant)>0 ? Number(p.montant) : 0), 0);
+  $('#statInscrits').textContent = String(inscrits);
+  $('#statPresents').textContent = String(presents);
   $('#statTotal').textContent = fmt(total)+' €';
 }
 
@@ -328,7 +340,7 @@ $('#rowSave').addEventListener('click', ()=>{
   if(!phoneValid(tel)){ alert('Téléphone invalide : 04 + 8 chiffres.'); return; }
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
   p.nom = nom; p.prenom = prenom; p.tel = tel; p.mail = mail;
-  sortPlayers(); save(); render(); toast('Modifié ✔️'); closeRowSheet(); /* ✅ tri aussi après édition */
+  sortPlayers(); save(); render(); toast('Modifié ✔️'); closeRowSheet();
 });
 $('#rowDelete').addEventListener('click', ()=>{
   if(!currentRowId) return;
@@ -338,7 +350,7 @@ $('#rowDelete').addEventListener('click', ()=>{
   }
 });
 
-/* ===== Ajout / export / options / import ===== */
+/* ===== Ajout / export / options ===== */
 $('#addForm').addEventListener('submit', (e)=>{
   e.preventDefault();
   const prenom = $('#prenom').value.trim();
@@ -349,8 +361,7 @@ $('#addForm').addEventListener('submit', (e)=>{
   if(!phoneValid(tel)){ alert('Téléphone invalide : 04 + 8 chiffres.'); return; }
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
   state.players.push({ id:crypto.randomUUID(), prenom, nom, tel, mail, present:false, montant:null });
-  sortPlayers(); /* ✅ tri automatique dès l’ajout */
-  save(); e.target.reset(); render(); toast('Ajouté ✔️');
+  sortPlayers(); save(); e.target.reset(); render(); toast('Ajouté ✔️');
 });
 
 $('#saveAll').addEventListener('click', ()=>{ save(); toast('Sauvegardé ✔️'); });
@@ -386,6 +397,7 @@ $('#btnImport').addEventListener('click', ()=>{ optSheet.classList.add('show'); 
 
 $('#toggleTel').addEventListener('click', ()=>{ state.hideTel=!state.hideTel; save(); render(); });
 $('#toggleMail').addEventListener('click', ()=>{ state.hideMail=!state.hideMail; save(); render(); });
+$('#toggleActions').addEventListener('click', ()=>{ state.hideActions=!state.hideActions; save(); render(); });
 
 /* ===== Import CSV robuste ===== */
 (()=> {
@@ -426,8 +438,7 @@ async function doImportCsv(file, mode='append'){
     }
     if(valid.length===0){ alert('Aucune ligne valide.'); return; }
     state.players = (mode==='replace') ? valid : valid.concat(state.players);
-    sortPlayers(); /* ✅ tri aussi après import */
-    save(); render(); toast(`Importé ${valid.length} ✔️`);
+    sortPlayers(); save(); render(); toast(`Importé ${valid.length} ✔️`);
   }catch(err){ console.error(err); alert('Erreur import : '+(err?.message||err)); }
 }
 async function fileToTextSmart(file){
