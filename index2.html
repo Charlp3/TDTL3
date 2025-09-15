@@ -2,12 +2,11 @@
 <html lang="fr" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>TDTL v2.4</title>
+  <title>TDTL v2.5</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
   <meta name="theme-color" content="#0a84ff" />
   <style>
     :root{
-      /* Gris assombris */
       --upper:#c7c8ce; --page:#d1d2d8; --panel:#ffffff;
       --ink:#111; --sub:#444; --border:#b1b2b8; --accent:#007aff;
       --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
@@ -32,7 +31,7 @@
       background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%);
     }
 
-    /* Header */
+    /* Header (au-dessus du tableau) */
     header{position:sticky;top:0;z-index:40;background:var(--upper);border-bottom:1px solid var(--border);
            padding:calc(4px + env(safe-area-inset-top)) 12px 4px}
     h1{margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
@@ -55,9 +54,24 @@
 
     /* Table compacte */
     .tblWrap{max-height:60svh;overflow:auto}
-    table{width:100%;border-collapse:separate;border-spacing:0;min-width:520px} /* étroit pour iPhone */
-    thead th{position:sticky;top:0;padding:6px 8px;text-align:left;font-size:.75rem;color:#f2f2f7;background:var(--head-dark)}
-    tbody td{padding:6px 8px;border-bottom:1px solid var(--border);font-size:.9rem}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:520px}
+    thead th{
+      position:sticky;
+      top:0;
+      z-index:5; /* sous les bandeaux */
+      background:var(--head-dark);
+      color:#f2f2f7;
+      padding:6px 8px;
+      font-size:.75rem;
+      text-align:left;
+    }
+    tbody td{
+      padding:6px 8px;
+      border-bottom:1px solid var(--border);
+      font-size:.9rem;
+      position:relative; /* corrige le chevauchement des cases */
+      z-index:1;
+    }
     tbody tr:nth-child(odd){background:var(--zebra1)}
     tbody tr:nth-child(even){background:var(--zebra2)}
     .hiddenCol{display:none}
@@ -80,12 +94,12 @@
     .rowActions{display:flex;gap:4px}
     .rowActions .btn{height:28px;padding:0 6px;font-size:.75rem;border-radius:8px}
 
-    /* Barre basse */
+    /* Barre basse (au-dessus du tableau) */
     .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(245,245,247,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
             padding:8px;display:flex;gap:8px}
     .fabBar .btn{flex:1}
 
-    /* Sheets */
+    /* Feuilles (sheets) */
     .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:#fff;color:#111;
            border-radius:12px 12px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);transform:translateY(100%);transition:.25s;padding:12px;max-height:70svh;overflow:auto}
     .sheet.show{transform:translateY(0)}
@@ -100,13 +114,11 @@
 </head>
 <body>
   <header>
-    <h1>TDTL <span class="version" id="version">v2.4</span></h1>
+    <h1>TDTL <span class="version" id="version">v2.5</span></h1>
   </header>
 
   <div class="wrap">
     <div class="card">
-
-      <!-- 1ère ligne : actions + stats -->
       <div class="toolbar">
         <button class="btn" id="btnImport">Importer</button>
         <button class="btn" id="btnOptions">Options</button>
@@ -115,24 +127,22 @@
         <span class="stat">Total: <strong id="statTotal">0,00 €</strong></span>
       </div>
 
-      <!-- Formulaire d'ajout (sans présent/montant) -->
       <form class="add" id="addForm" novalidate>
-        <div><label>Prénom</label><input id="prenom" required autocomplete="given-name" placeholder="Jean"></div>
-        <div><label>Nom</label><input id="nom" required autocomplete="family-name" placeholder="Dupont"></div>
+        <div><label>Prénom</label><input id="prenom" required placeholder="Jean" autocomplete="given-name"></div>
+        <div><label>Nom</label><input id="nom" required placeholder="Dupont" autocomplete="family-name"></div>
         <div><label>Tel (04XXXXXXXX)</label><input id="tel" maxlength="10" inputmode="numeric" placeholder="0412345678"></div>
         <div><label>Mail</label><input id="mail" type="email" placeholder="ex: joueur@mail.fr"></div>
         <button class="btn primary" type="submit">Ajouter</button>
       </form>
 
-      <!-- Liste -->
       <div class="tblWrap">
-        <table id="tbl">
+        <table>
           <thead>
             <tr>
               <th class="col-name">Nom & Prénom</th>
               <th class="th-tel">Téléphone</th>
               <th class="th-mail">E-mail</th>
-              <th class="presentCell col-pres">Présent</th>
+              <th class="col-pres">Présent</th>
               <th class="col-money">Montant (€)</th>
               <th class="col-actions th-actions">Actions</th>
             </tr>
@@ -141,11 +151,10 @@
         </table>
       </div>
 
-      <div id="empty" style="display:none; padding:12px; text-align:center; color:var(--sub)">Aucun joueur.</div>
+      <div id="empty" style="display:none;padding:12px;text-align:center;color:var(--sub)">Aucun joueur.</div>
     </div>
   </div>
 
-  <!-- Barre basse -->
   <div class="fabBar">
     <button class="btn" id="exportNamesAmounts">Exporter</button>
     <button class="btn primary" id="saveAll">Sauver</button>
@@ -154,29 +163,13 @@
   <!-- Sheet Options & Import -->
   <div id="sheetOptions" class="sheet" aria-hidden="true">
     <h3>Options & Import</h3>
-    <div class="row">
-      <label>Colonne Téléphone</label>
-      <button class="btn" id="toggleTel">Afficher</button>
-    </div>
-    <div class="row">
-      <label>Colonne E-mail</label>
-      <button class="btn" id="toggleMail">Afficher</button>
-    </div>
-    <div class="row">
-      <label>Colonne Actions</label>
-      <button class="btn" id="toggleActions">Afficher</button>
-    </div>
+    <div class="row"><label>Colonne Téléphone</label><button class="btn" id="toggleTel">Afficher</button></div>
+    <div class="row"><label>Colonne E-mail</label><button class="btn" id="toggleMail">Afficher</button></div>
+    <div class="row"><label>Colonne Actions</label><button class="btn" id="toggleActions">Afficher</button></div>
     <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
-    <div class="row">
-      <label>Fichier CSV</label>
-      <input type="file" id="csvFile" accept=".csv,text/csv" />
-    </div>
-    <div class="row">
-      <label>Mode import</label>
-      <select id="importMode">
-        <option value="append">Ajouter</option>
-        <option value="replace">Remplacer</option>
-      </select>
+    <div class="row"><label>Fichier CSV</label><input type="file" id="csvFile" accept=".csv,text/csv" /></div>
+    <div class="row"><label>Mode import</label>
+      <select id="importMode"><option value="append">Ajouter</option><option value="replace">Remplacer</option></select>
     </div>
     <div class="actions">
       <button class="btn" id="closeOptions">Fermer</button>
@@ -202,9 +195,9 @@
 
 <script>
 /* ===== Version / stockage ===== */
-const VERSION = '2.4';
-document.getElementById('version').textContent = 'v' + VERSION;
-const STORAGE_KEY = 'tdtl_v_' + VERSION.replaceAll('.','_');
+const VERSION='2.5';
+document.getElementById('version').textContent='v'+VERSION;
+const STORAGE_KEY='tdtl_v_'+VERSION.replaceAll('.','_');
 
 /* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
@@ -223,9 +216,7 @@ function loadState(){
       {id:crypto.randomUUID(), prenom:'Pierre', nom:'CHARLIER', tel:'0412345678', mail:'', present:true,  montant:1},
       {id:crypto.randomUUID(), prenom:'Coco',   nom:'CICI',      tel:'',          mail:'', present:true,  montant:0},
     ],
-    hideTel:true,
-    hideMail:true,
-    hideActions:true  // ✅ Actions masquées par défaut
+    hideTel:true, hideMail:true, hideActions:true
   };
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -252,10 +243,10 @@ function badgeClass(p){
   return '';
 }
 function render(){
-  // toggles d'options
-  $('#toggleTel').textContent      = state.hideTel      ? 'Afficher' : 'Masquer';
-  $('#toggleMail').textContent     = state.hideMail     ? 'Afficher' : 'Masquer';
-  $('#toggleActions').textContent  = state.hideActions  ? 'Afficher' : 'Masquer';
+  // Toggles d'options
+  $('#toggleTel').textContent     = state.hideTel     ? 'Afficher' : 'Masquer';
+  $('#toggleMail').textContent    = state.hideMail    ? 'Afficher' : 'Masquer';
+  $('#toggleActions').textContent = state.hideActions ? 'Afficher' : 'Masquer';
 
   $('.th-tel')?.classList.toggle('hiddenCol', state.hideTel);
   $('.th-mail')?.classList.toggle('hiddenCol', state.hideMail);
@@ -267,7 +258,7 @@ function render(){
   state.players.forEach(p=>{
     const tr = document.createElement('tr');
 
-    // Nom & Prénom
+    // Nom & Prénom (clic => fiche)
     const tdName = document.createElement('td'); tdName.className='col-name';
     const nameBox = document.createElement('div'); nameBox.className='nameCell'; nameBox.title='Éditer';
     const badge = document.createElement('span'); badge.className='nameBadge ' + badgeClass(p);
@@ -275,10 +266,11 @@ function render(){
     nameBox.append(badge, nameText); tdName.appendChild(nameBox); tr.appendChild(tdName);
     nameBox.addEventListener('click', ()=> openRowSheet(p.id));
 
-    // Tel / Mail
+    // Tel
     const tdTel = document.createElement('td'); tdTel.className = (state.hideTel ? 'hiddenCol ' : '') + 'th-tel';
     tdTel.textContent = p.tel || '—'; tr.appendChild(tdTel);
 
+    // Mail
     const tdMail= document.createElement('td'); tdMail.className = (state.hideMail ? 'hiddenCol ' : '') + 'th-mail';
     tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
 
@@ -298,8 +290,7 @@ function render(){
     // Actions (optionnel)
     const tdAct = document.createElement('td'); tdAct.className='rowActions col-actions ' + (state.hideActions ? 'hiddenCol' : '');
     const edit = document.createElement('button'); edit.className='btn'; edit.textContent='✎'; edit.onclick=()=>openRowSheet(p.id);
-    const del  = document.createElement('button'); del.className='btn'; del.style.cssText='background:#fff0f0;color:#b10000;border-color:#ffd1d1';
-    del.textContent='Suppr';
+    const del  = document.createElement('button'); del.className='btn'; del.style.cssText='background:#fff0f0;color:#b10000;border-color:#ffd1d1'; del.textContent='Suppr';
     del.onclick=()=>{ if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){ state.players = state.players.filter(x=>x.id!==p.id); save(); render(); } };
     tdAct.append(edit, del); tr.appendChild(tdAct);
 
@@ -312,7 +303,7 @@ function render(){
   const total = state.players.reduce((s,p)=> s + (p.present && Number(p.montant)>0 ? Number(p.montant) : 0), 0);
   $('#statInscrits').textContent = String(inscrits);
   $('#statPresents').textContent = String(presents);
-  $('#statTotal').textContent = fmt(total)+' €';
+  $('#statTotal').textContent    = fmt(total)+' €';
 }
 
 /* ===== Sheet ligne ===== */
@@ -321,10 +312,10 @@ function openRowSheet(id){
   currentRowId = id;
   const p = state.players.find(x=>x.id===id); if(!p) return;
   $('#rowTitle').textContent = `${p.nom.toUpperCase()} ${p.prenom}`;
-  $('#rowNom').value = p.nom || '';
-  $('#rowPrenom').value = p.prenom || '';
-  $('#rowTel').value = p.tel || '';
-  $('#rowMail').value = p.mail || '';
+  $('#rowNom').value    = p.nom   || '';
+  $('#rowPrenom').value = p.prenom|| '';
+  $('#rowTel').value    = p.tel   || '';
+  $('#rowMail').value   = p.mail  || '';
   $('#sheetRow').classList.add('show'); $('#sheetRow').setAttribute('aria-hidden','false');
 }
 function closeRowSheet(){ $('#sheetRow').classList.remove('show'); $('#sheetRow').setAttribute('aria-hidden','true'); currentRowId=null; }
@@ -346,7 +337,8 @@ $('#rowDelete').addEventListener('click', ()=>{
   if(!currentRowId) return;
   const p = state.players.find(x=>x.id===currentRowId); if(!p) return;
   if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){
-    state.players = state.players.filter(x=>x.id!==p.id); save(); render(); closeRowSheet();
+    state.players = state.players.filter(x=>x.id!==p.id);
+    save(); render(); closeRowSheet();
   }
 });
 
@@ -432,7 +424,7 @@ async function doImportCsv(file, mode='append'){
       const present= !!r.present;
       const montant= (r.montant==='' || r.montant===null || typeof r.montant==='undefined') ? null : Number(r.montant);
       if(!prenom || !nom) continue;
-      if(!phoneValid(tel)) continue;
+      if(!phoneValid(tel)) continue; // vide ou 04xxxxxxxx
       if(!emailValid(mail)) continue;
       valid.push({ id:crypto.randomUUID(), prenom, nom, tel, mail, present, montant });
     }
@@ -455,8 +447,15 @@ function parseCsvWithSep(text, sep){
   const pushRow  =()=>{ rows.push(row); row=[]; };
   while(i<text.length){
     const c=text[i];
-    if(inQ){ if(c=='"'){ if(text[i+1]=='"'){ field+='"'; i++; } else { inQ=false; } } else field+=c; }
-    else{ if(c=='"') inQ=true; else if(c==sep) pushField(); else if(c=='\n'){ pushField(); pushRow(); } else if(c!='\r') field+=c; }
+    if(inQ){
+      if(c=='"'){ if(text[i+1]=='"'){ field+='"'; i++; } else { inQ=false; } }
+      else field+=c;
+    }else{
+      if(c=='"') inQ=true;
+      else if(c==sep) pushField();
+      else if(c=='\n'){ pushField(); pushRow(); }
+      else if(c!='\r') field+=c;
+    }
     i++;
   }
   pushField(); if(row.length>1 || row[0]!=='') pushRow();
