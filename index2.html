@@ -1,100 +1,104 @@
 <!doctype html>
 <html lang="fr" data-theme="auto">
 <head>
-<meta charset="utf-8" />
-<title>TDTL v2.0</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-<meta name="theme-color" content="#0a84ff" />
-<style>
-  /* ===== Thème auto (suit l’iPhone) ===== */
-  :root{
-    --upper:#d9dae0;            /* gris + foncé pour le haut */
-    --page:#e5e5ea;
-    --panel:#ffffff;
-    --ink:#111; --sub:#555; --border:#c7c8ce; --accent:#007aff;
-    --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
-    --head-dark:#3a3a3c;
-    --fab-h:60px;
-    --sheet-bg:#ffffff; --sheet-text:#111;
-    --table-head-text:#f2f2f7;
-    --toast-bg:#111; --toast-fg:#fff;
-  }
-  @media (prefers-color-scheme: dark){
+  <meta charset="utf-8" />
+  <title>TDTL v2.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0a84ff" />
+  <style>
     :root{
-      --upper:#1c1c1e; --page:#111113; --panel:#1a1a1d;
-      --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
-      --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
-      --head-dark:#1f1f22; --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
-      --toast-bg:#0b0b0d; --toast-fg:#fff;
+      --upper:#d9dae0; --page:#e5e5ea; --panel:#ffffff;
+      --ink:#111; --sub:#555; --border:#c7c8ce; --accent:#007aff;
+      --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
+      --head-dark:#3a3a3c;
+      --fab-h:60px;
+      --sheet-bg:#ffffff; --sheet-text:#111;
+      --table-head-text:#f2f2f7;
+      --toast-bg:#111; --toast-fg:#fff;
     }
-  }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --upper:#1c1c1e; --page:#111113; --panel:#1a1a1d;
+        --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
+        --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
+        --head-dark:#1f1f22; --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
+        --toast-bg:#0b0b0d; --toast-fg:#fff;
+      }
+    }
 
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
-       background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
+         background:linear-gradient(180deg,var(--upper) 0%, var(--page) 420px, var(--page) 100%)}
 
-  /* Header compact */
-  header{position:sticky;top:0;z-index:40;background:var(--upper);border-bottom:1px solid var(--border);
-         padding:calc(4px + env(safe-area-inset-top)) 12px 4px}
-  h1{margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
-  .version{font-size:.8rem;color:var(--sub)}
+    /* Header */
+    header{position:sticky;top:0;z-index:40;background:var(--upper);border-bottom:1px solid var(--border);
+           padding:calc(4px + env(safe-area-inset-top)) 12px 4px}
+    h1{margin:0;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:6px}
+    .version{font-size:.8rem;color:var(--sub)}
 
-  .wrap{max-width:1100px;margin:0 auto;padding:12px 12px calc(var(--fab-h) + 16px)}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .wrap{max-width:1100px;margin:0 auto;padding:12px 12px calc(var(--fab-h) + 16px)}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 
-  /* Panneau supérieur (plus sombre, concis) */
-  .toolbar{display:flex;gap:8px;padding:8px;align-items:center;justify-content:flex-start;flex-wrap:wrap;
-           background:var(--upper);border-bottom:1px solid var(--border)}
-  .btn{height:32px;padding:0 10px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.85rem;font-weight:600;cursor:pointer}
-  .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
-  .btn.danger{background:#fff0f0;color:#b10000;border-color:#ffd1d1}
+    /* Panneau supérieur */
+    .toolbar{display:flex;gap:8px;padding:8px;align-items:center;justify-content:flex-start;flex-wrap:wrap;
+             background:var(--upper);border-bottom:1px solid var(--border)}
+    .btn{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:.9rem;font-weight:600;cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
+    .btn.danger{background:#fff0f0;color:#b10000;border-color:#ffd1d1}
 
-  .displayBar{display:flex;gap:10px;align-items:center;padding:6px 8px;background:var(--upper);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.85rem}
-  .pill{background:#fff;border:1px solid var(--border);padding:2px 8px;border-radius:999px}
+    .displayBar{display:flex;gap:10px;align-items:center;padding:6px 8px;background:var(--upper);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.95rem}
+    .pill{background:#fff;border:1px solid var(--border);padding:4px 10px;border-radius:999px}
 
-  form.add{display:grid;grid-template-columns:repeat(6,1fr) auto;gap:8px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)}
-  label{font-size:.7rem;color:var(--sub);margin:0 0 2px}
-  input,select{width:100%;height:32px;padding:4px 6px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:.85rem}
+    /* Formulaire d'ajout (sans montant ni présent) */
+    form.add{
+      display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;padding:8px;background:var(--upper);border-bottom:1px solid var(--border)
+    }
+    label{font-size:.8rem;color:var(--sub);margin:0 0 4px}
+    input,select{
+      width:100%;height:40px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1rem
+    }
+    .full{grid-column:1/-1}
 
-  /* Liste zébrée */
-  .tblWrap{max-height:60svh;overflow:auto}
-  table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
-  thead th{position:sticky;top:0;z-index:30;padding:8px;text-align:left;font-size:.8rem;color:var(--table-head-text);background:var(--head-dark)}
-  tbody td{padding:10px;border-bottom:1px solid var(--border);font-size:.9rem}
-  tbody tr:nth-child(odd){background:#f3f3f6}
-  tbody tr:nth-child(even){background:#e6e6eb}
-  @media (prefers-color-scheme: dark){
-    tbody tr:nth-child(odd){background:#2c2c2e}
-    tbody tr:nth-child(even){background:#3a3a3c}
-  }
+    /* Liste zébrée */
+    .tblWrap{max-height:60svh;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:820px}
+    thead th{position:sticky;top:0;z-index:30;padding:8px;text-align:left;font-size:.8rem;color:var(--table-head-text);background:var(--head-dark)}
+    tbody td{padding:10px;border-bottom:1px solid var(--border);font-size:.95rem}
+    tbody tr:nth-child(odd){background:#f3f3f6}
+    tbody tr:nth-child(even){background:#e6e6eb}
+    @media (prefers-color-scheme: dark){
+      tbody tr:nth-child(odd){background:#2c2c2e}
+      tbody tr:nth-child(even){background:#3a3a3c}
+    }
 
-  .nameCell{display:flex;align-items:center;gap:10px;cursor:pointer}
-  .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.1)}
-  .nameBadge.green{background:#28cd41;border-color:#1e9731}
-  .nameBadge.red{background:#ff3b30;border-color:#d62a21}
-  .nameBadge.yellow{background:#ffcc00;border-color:#e0b500}
+    .nameCell{display:flex;align-items:center;gap:10px;cursor:pointer}
+    .nameBadge{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.1)}
+    .nameBadge.green{background:#28cd41;border-color:#1e9731}
+    .nameBadge.red{background:#ff3b30;border-color:#d62a21}
+    .nameBadge.yellow{background:#ffcc00;border-color:#e0b500}
 
-  .presentCell input{transform:scale(1.15)}
-  .money input{max-width:100px}
-  .hiddenCol{display:none}
-  .rowActions{display:flex;gap:6px;align-items:center}
+    .presentCell input{transform:scale(1.15)}
+    .money input{max-width:110px}
+    .hiddenCol{display:none}
+    .rowActions{display:flex;gap:8px;align-items:center}
 
-  .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(250,250,252,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
-          padding:8px;display:flex;gap:8px}
-  .fabBar .btn{flex:1}
+    /* Barre basse */
+    .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(250,250,252,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);
+            padding:8px;display:flex;gap:8px}
+    .fabBar .btn{flex:1}
 
-  /* Sheets */
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sheet-bg);color:var(--sheet-text);
-         border-radius:12px 12px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);transform:translateY(100%);transition:.25s;padding:12px;max-height:70svh;overflow:auto}
-  .sheet.show{transform:translateY(0)}
-  .sheet h3{margin:0 0 10px}
-  .sheet .row{display:grid;grid-template-columns:110px 1fr;gap:8px;margin-bottom:8px}
-  .sheet .actions{display:flex;gap:8px;justify-content:flex-end}
+    /* Sheets */
+    .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sheet-bg);color:var(--sheet-text);
+           border-radius:12px 12px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);transform:translateY(100%);transition:.25s;padding:12px;max-height:70svh;overflow:auto}
+    .sheet.show{transform:translateY(0)}
+    .sheet h3{margin:0 0 10px}
+    .sheet .row{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-bottom:10px}
+    .sheet .actions{display:flex;gap:10px;justify-content:flex-end}
 
-  .toast{position:fixed;bottom:calc(var(--fab-h) + 12px);right:16px;background:var(--toast-bg);color:var(--toast-fg);
-         padding:8px 12px;border-radius:8px;opacity:0;transition:.25s}
-  .toast.show{opacity:1}
-</style>
+    .toast{position:fixed;bottom:calc(var(--fab-h) + 12px);right:16px;background:var(--toast-bg);color:var(--toast-fg);
+           padding:8px 12px;border-radius:8px;opacity:0;transition:.25s}
+    .toast.show{opacity:1}
+  </style>
 </head>
 <body>
   <header>
@@ -115,16 +119,12 @@
         <span class="pill">Total: <strong id="statTotal">0,00 €</strong></span>
       </div>
 
-      <!-- Formulaire d'ajout -->
+      <!-- Formulaire d'ajout (Sans Montant & Présent) -->
       <form class="add" id="addForm" novalidate>
-        <div><label>Prénom</label><input id="prenom" required autocomplete="given-name"></div>
-        <div><label>Nom</label><input id="nom" required autocomplete="family-name"></div>
-        <div><label>Tel (04XXXXXXXX)</label><input id="tel" maxlength="10" inputmode="numeric" placeholder="04XXXXXXXX"></div>
+        <div><label>Prénom</label><input id="prenom" required autocomplete="given-name" placeholder="Jean"></div>
+        <div><label>Nom</label><input id="nom" required autocomplete="family-name" placeholder="Dupont"></div>
+        <div><label>Tel (04XXXXXXXX)</label><input id="tel" maxlength="10" inputmode="numeric" placeholder="0412345678"></div>
         <div><label>Mail</label><input id="mail" type="email" placeholder="ex: joueur@mail.fr"></div>
-        <div><label>Montant (€)</label><input id="montant" type="number" inputmode="decimal" min="0" step="0.01"></div>
-        <div><label>Présent</label>
-          <select id="present"><option value="false">Non</option><option value="true">Oui</option></select>
-        </div>
         <button class="btn primary" type="submit">Ajouter</button>
       </form>
 
@@ -139,7 +139,7 @@
               <th class="th-mail">E-mail</th>
               <th class="presentCell">Présent</th>
               <th>Montant (€)</th>
-              <th style="width:120px">Actions</th>
+              <th style="width:140px">Actions</th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -162,11 +162,11 @@
     <h3>Options & Import</h3>
     <div class="row">
       <label>Colonne Téléphone</label>
-      <button class="btn" id="toggleTel">Masquer</button>
+      <button class="btn" id="toggleTel">Afficher</button>
     </div>
     <div class="row">
       <label>Colonne E-mail</label>
-      <button class="btn" id="toggleMail">Masquer</button>
+      <button class="btn" id="toggleMail">Afficher</button>
     </div>
     <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
     <div class="row">
@@ -207,11 +207,10 @@
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const fmt = n => (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
-const STORAGE_KEY = 'tdtl_v20_fixed';
-
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
+const STORAGE_KEY = 'tdtl_v20_form_slim';
 const phoneValid = v => !v || /^04\d{8}$/.test(String(v||'').trim());
 const emailValid = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim());
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1200); }
 
 let state = loadState();
 function loadState(){
@@ -221,7 +220,8 @@ function loadState(){
       {id:crypto.randomUUID(), prenom:'Pierre', nom:'CHARLIER', tel:'0412345678', mail:'', present:true,  montant:1},
       {id:crypto.randomUUID(), prenom:'Coco',   nom:'CICI',      tel:'',          mail:'', present:true,  montant:0},
     ],
-    hideTel:false, hideMail:false
+    hideTel:true,   // ✅ masqué par défaut
+    hideMail:true   // ✅ masqué par défaut
   };
 }
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -237,7 +237,7 @@ function badgeClass(p){
 }
 function render(){
   // options UI
-  $('#toggleTel').textContent = state.hideTel ? 'Afficher' : 'Masquer';
+  $('#toggleTel').textContent  = state.hideTel  ? 'Afficher' : 'Masquer';
   $('#toggleMail').textContent = state.hideMail ? 'Afficher' : 'Masquer';
   $('.th-tel')?.classList.toggle('hiddenCol', state.hideTel);
   $('.th-mail')?.classList.toggle('hiddenCol', state.hideMail);
@@ -261,11 +261,11 @@ function render(){
     nameBox.append(badge, nameText); tdName.appendChild(nameBox); tr.appendChild(tdName);
     nameBox.addEventListener('click', ()=> openRowSheet(p.id));
 
-    // Tel
+    // Tel (masqué par défaut)
     const tdTel = document.createElement('td'); tdTel.className = state.hideTel ? 'hiddenCol' : '';
     tdTel.textContent = p.tel || '—'; tr.appendChild(tdTel);
 
-    // Mail
+    // Mail (masqué par défaut)
     const tdMail = document.createElement('td'); tdMail.className = state.hideMail ? 'hiddenCol' : '';
     tdMail.textContent = p.mail || '—'; tr.appendChild(tdMail);
 
@@ -277,7 +277,7 @@ function render(){
 
     // Montant
     const tdMoney = document.createElement('td');
-    const m = document.createElement('input'); m.type='number'; m.inputMode='decimal'; m.min='0'; m.step='0.01'; m.style.maxWidth='100px';
+    const m = document.createElement('input'); m.type='number'; m.inputMode='decimal'; m.min='0'; m.step='0.01'; m.style.maxWidth='110px';
     m.value = (p.montant===null || typeof p.montant==='undefined') ? '' : String(p.montant);
     m.addEventListener('input', ()=>{ const v=m.value.trim(); p.montant = v==='' ? null : Number(v); save(); render(); });
     tdMoney.appendChild(m); tr.appendChild(tdMoney);
@@ -285,7 +285,7 @@ function render(){
     // Actions
     const tdAct = document.createElement('td'); tdAct.className='rowActions';
     const edit = document.createElement('button'); edit.className='btn'; edit.textContent='✎'; edit.onclick=()=>openRowSheet(p.id);
-    const del = document.createElement('button'); del.className='btn danger'; del.textContent='Suppr';
+    const del  = document.createElement('button'); del.className='btn danger'; del.textContent='Suppr';
     del.onclick=()=>{ if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){ state.players = state.players.filter(x=>x.id!==p.id); save(); render(); } };
     tdAct.append(edit, del); tr.appendChild(tdAct);
 
@@ -343,13 +343,11 @@ $('#addForm').addEventListener('submit', (e)=>{
   const nom    = $('#nom').value.trim();
   const tel    = $('#tel').value.trim();
   const mail   = $('#mail').value.trim();
-  const present= $('#present').value === 'true';
-  const montant= $('#montant').value.trim();
   if(!prenom || !nom){ alert('Nom et prénom requis.'); return; }
   if(!phoneValid(tel)){ alert('Téléphone invalide : 04 + 8 chiffres.'); return; }
   if(!emailValid(mail)){ alert('E-mail invalide.'); return; }
-  state.players.unshift({ id:crypto.randomUUID(), prenom, nom, tel, mail, present, montant: montant==='' ? null : Number(montant) });
-  save(); e.target.reset(); $('#present').value='false'; render(); toast('Ajouté ✔️');
+  state.players.unshift({ id:crypto.randomUUID(), prenom, nom, tel, mail, present:false, montant:null });
+  save(); e.target.reset(); render(); toast('Ajouté ✔️');
 });
 
 $('#selectAll').addEventListener('change', e=> $$('.rowSel').forEach(cb=> cb.checked=e.target.checked));
@@ -382,38 +380,32 @@ $('#exportNamesAmounts').addEventListener('click', async ()=>{
 });
 function csvEscape(s){ s=String(s); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
 function downloadCsv(content, filename){
-  const blob = new Blob([content], {type:'text/csv;charset=utf-8;'});
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+  const blob = new Blob([content], {type:"text/csv;charset=utf-8;"});
+  const a = document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove();
 }
 
-/* ===== Options & Import (sheet) ===== */
-const sheet = $('#sheetOptions');
-$('#btnOptions').addEventListener('click', ()=>{ sheet.classList.add('show'); sheet.setAttribute('aria-hidden','false'); });
-$('#closeOptions').addEventListener('click', ()=>{ sheet.classList.remove('show'); sheet.setAttribute('aria-hidden','true'); });
-$('#btnImport').addEventListener('click', ()=>{ sheet.classList.add('show'); sheet.setAttribute('aria-hidden','false'); $('#csvFile').focus(); });
+/* ===== Options & Import ===== */
+const optSheet = $('#sheetOptions');
+$('#btnOptions').addEventListener('click', ()=>{ optSheet.classList.add('show'); optSheet.setAttribute('aria-hidden','false'); });
+$('#closeOptions').addEventListener('click', ()=>{ optSheet.classList.remove('show'); optSheet.setAttribute('aria-hidden','true'); });
 
+$('#btnImport').addEventListener('click', ()=>{ optSheet.classList.add('show'); optSheet.setAttribute('aria-hidden','false'); $('#csvFile').focus(); });
 $('#toggleTel').addEventListener('click', ()=>{ state.hideTel=!state.hideTel; save(); render(); });
 $('#toggleMail').addEventListener('click', ()=>{ state.hideMail=!state.hideMail; save(); render(); });
 
 /* ===== Import CSV robuste ===== */
-(() => {
-  const fileInput = $('#csvFile');
-  const importBtn = $('#importCsvBtn');
-  const modeSel   = $('#importMode');
-
-  // Auto-import dès sélection (iPhone friendly)
+(()=> {
+  const fileInput=$('#csvFile'), importBtn=$('#importCsvBtn'), modeSel=$('#importMode');
   fileInput?.addEventListener('change', async ()=>{
     if(!fileInput.files?.[0]) return;
     await doImportCsv(fileInput.files[0], modeSel?.value || 'append');
-    sheet.classList.remove('show'); sheet.setAttribute('aria-hidden','true');
+    optSheet.classList.remove('show'); optSheet.setAttribute('aria-hidden','true');
     fileInput.value='';
   });
-
-  // Import via bouton
   importBtn?.addEventListener('click', async ()=>{
     const f=fileInput?.files?.[0]; if(!f){ alert('Choisissez un fichier CSV.'); return; }
     await doImportCsv(f, modeSel?.value || 'append');
-    sheet.classList.remove('show'); sheet.setAttribute('aria-hidden','true');
+    optSheet.classList.remove('show'); optSheet.setAttribute('aria-hidden','true');
     fileInput.value='';
   });
 })();
@@ -434,7 +426,7 @@ async function doImportCsv(file, mode='append'){
       const present= !!r.present;
       const montant= (r.montant==='' || r.montant===null || typeof r.montant==='undefined') ? null : Number(r.montant);
       if(!prenom || !nom) continue;
-      if(!phoneValid(tel)) continue;       // doit être vide OU 04xxxxxxxx
+      if(!phoneValid(tel)) continue; // vide OU 04xxxxxxxx
       if(!emailValid(mail)) continue;
       valid.push({ id:crypto.randomUUID(), prenom, nom, tel, mail, present, montant });
     }
@@ -446,9 +438,9 @@ async function doImportCsv(file, mode='append'){
 async function fileToTextSmart(file){
   const buf = await file.arrayBuffer();
   let text = new TextDecoder('utf-8', {fatal:false}).decode(buf);
-  const repl = (text.match(/\uFFFD/g)||[]).length;
-  if(repl>5){ try{ text = new TextDecoder('iso-8859-1', {fatal:false}).decode(buf); }catch{} }
-  if(text.charCodeAt(0)===0xFEFF) text = text.slice(1);
+  const repl=(text.match(/\uFFFD/g)||[]).length;
+  if(repl>5){ try{ text=new TextDecoder('iso-8859-1',{fatal:false}).decode(buf); }catch{} }
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
   return text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
 }
 function parseCsvWithSep(text, sep){
