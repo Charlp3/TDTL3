@@ -2,700 +2,204 @@
 <html lang="fr" data-theme="auto">
 <head>
   <meta charset="utf-8" />
-  <title>Présence Ping — iPhone 🏓</title>
+  <title>TDTL v2.0</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#0a84ff" id="themeColorMeta" />
   <style>
-    /* ================= Base (clair) ================= */
     :root{
-      --bg-top:#f2f2f7; --bg:#e5e5ea; --panel:#ffffff;
+      --upper:#f2f2f7; --page:#e5e5ea; --panel:#ffffff;
       --ink:#111; --sub:#555; --border:#d1d1d6; --accent:#007aff;
-      --ok:#34c759; --warn:#ff9f0a; --bad:#ff3b30;
-      --zebra-dark:#636366; --zebra-mid:#8e8e93; --head-dark:#3a3a3c;
-      --fab-h:64px;
+      --ok:#28cd41; --warn:#ffcc00; --bad:#ff3b30;
+      --head-dark:#3a3a3c;
+      --fab-h:60px;
       --sheet-bg:#ffffff; --sheet-text:#111;
       --table-head-text:#f2f2f7;
       --hover-outline: rgba(0,122,255,.25);
       --toast-bg:#111; --toast-fg:#fff;
-      color-scheme: light;
     }
-
-    /* ====== Forçage sombre via data-theme="dark" ====== */
     :root[data-theme="dark"]{
-      --bg-top:#1c1c1e; --bg:#111113; --panel:#1a1a1d;
+      --upper:#1c1c1e; --page:#111113; --panel:#1a1a1d;
       --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
       --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
-      --zebra-dark:#2c2c2e; --zebra-mid:#3a3a3c; --head-dark:#1f1f22;
+      --head-dark:#1f1f22;
       --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
       --hover-outline: rgba(10,132,255,.35);
       --toast-bg:#0b0b0d; --toast-fg:#fff;
-      color-scheme: dark;
     }
 
-    /* ====== Auto sombre (si data-theme="auto", on suit l’OS) ====== */
-    @media (prefers-color-scheme: dark) {
-      :root[data-theme="auto"]{
-        --bg-top:#1c1c1e; --bg:#111113; --panel:#1a1a1d;
-        --ink:#e6e6eb; --sub:#a1a1a7; --border:#2c2c2e; --accent:#0a84ff;
-        --ok:#30d158; --warn:#ffd60a; --bad:#ff453a;
-        --zebra-dark:#2c2c2e; --zebra-mid:#3a3a3c; --head-dark:#1f1f22;
-        --sheet-bg:#161618; --sheet-text:#eaeaf0; --table-head-text:#d8d8df;
-        --hover-outline: rgba(10,132,255,.35);
-        --toast-bg:#0b0b0d; --toast-fg:#fff;
-        color-scheme: dark;
-      }
-    }
+    body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,var(--upper)0%,var(--page)420px,var(--page)100%)}
 
-    *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu,Helvetica,Arial,sans-serif;
-      background:linear-gradient(180deg,var(--bg-top) 0%, var(--bg) 420px, var(--bg) 100%);
-    }
-    header{
-      position:sticky; top:0; z-index:40;
-      padding:calc(10px + env(safe-area-inset-top)) 16px 10px 16px;
-      background:var(--bg-top); border-bottom:1px solid var(--border);
-    }
-    h1{margin:0; font-size:1.15rem; font-weight:700}
-    .wrap{max-width:1100px; margin:0 auto; padding:12px 12px calc(var(--fab-h) + 16px + env(safe-area-inset-bottom));}
+    /* ===== Header compact ===== */
+    header{position:sticky;top:0;z-index:40;padding:4px 12px;background:var(--upper);border-bottom:1px solid var(--border)}
+    h1{margin:0;font-size:1rem;font-weight:700}
 
-    .card{
-      background:var(--panel); border:1px solid var(--border); border-radius:16px;
-      overflow:hidden; box-shadow:0 6px 20px rgba(0,0,0,.06);
-    }
+    .wrap{max-width:1100px;margin:0 auto;padding:12px 12px calc(var(--fab-h)+16px)}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 
-    /* ====== Toolbar ====== */
-    .toolbar{
-      display:flex; gap:8px; padding:10px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-      background:var(--bg-top); border-bottom:1px solid var(--border);
-    }
-    .toolbar .left,.toolbar .right{display:flex; gap:8px; align-items:center}
-    .search{
-      min-width:180px; flex:1 1 220px; height:44px;
-      padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:#fff; color:var(--ink);
-    }
-    :root[data-theme="dark"] .search,
-    :root[data-theme="auto"][style*="--mode:dark"] .search{ background:#19191c; color:var(--ink); }
+    /* ===== Toolbar ===== */
+    .toolbar{display:flex;gap:6px;padding:6px;align-items:center;flex-wrap:wrap;background:var(--upper);border-bottom:1px solid var(--border)}
+    .search{flex:1 1 200px;height:32px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:#fff}
+    .btn{height:32px;padding:0 8px;border-radius:6px;border:1px solid var(--border);background:#fff;font-size:.8rem;font-weight:600;cursor:pointer}
+    .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff);color:#fff;border:none}
+    .btn.danger{background:#fff0f0;color:#b10000;border-color:#ffd1d1}
+    .seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:#fff}
+    .seg button{height:28px;padding:0 8px;border:0;background:transparent;font-size:.8rem}
+    .seg button.active{background:var(--accent);color:#fff}
 
-    .btn{
-      height:44px; padding:0 14px; border-radius:12px; border:1px solid var(--border);
-      background:#fff; color:var(--ink); font-weight:600; cursor:pointer;
-    }
-    .btn.primary{background:linear-gradient(180deg,#0a84ff,#007aff); color:#fff; border:none}
-    .btn.danger{background:#fff0f0; color:#b10000; border-color:#ffd1d1}
-    .btn.icon{width:44px; padding:0; display:inline-grid; place-items:center}
+    /* ===== Stats ===== */
+    .displayBar{display:flex;gap:10px;align-items:center;padding:4px 6px;background:var(--upper);border-top:1px solid var(--border);border-bottom:1px solid var(--border);font-size:.8rem}
+    .pill{background:#fff;border:1px solid var(--border);padding:2px 6px;border-radius:999px}
 
-    /* Segmented control (Auto / Clair / Sombre) */
-    .seg{
-      display:inline-flex; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:#fff;
-    }
-    .seg button{
-      height:36px; padding:0 12px; border:0; background:transparent; color:var(--ink); font-weight:600;
-    }
-    .seg button.active{ background:var(--accent); color:#fff; }
-    :root[data-theme="dark"] .seg{ background:#1f1f22; }
+    /* ===== Formulaire ===== */
+    form.add{display:grid;grid-template-columns:repeat(6,1fr) auto;gap:6px;padding:6px;background:var(--upper);border-bottom:1px solid var(--border)}
+    label{font-size:.7rem;color:var(--sub);margin:0 0 2px}
+    input,select{width:100%;height:28px;padding:2px 4px;border-radius:4px;border:1px solid var(--border);background:#fff;font-size:.8rem}
 
-    /* ====== Ligne d’affichage ====== */
-    .displayBar{
-      display:flex; gap:10px; align-items:center; padding:8px 10px; background:#fafafa; border-top:1px solid var(--border); border-bottom:1px solid var(--border);
-      position:sticky; top:calc(56px + env(safe-area-inset-top)); z-index:35; font-size:.95rem; color:var(--ink);
-    }
-    :root[data-theme="dark"] .displayBar,
-    :root[data-theme="auto"][style*="--mode:dark"] .displayBar{ background:#151518; }
-    .pill{background:#fff; border:1px solid var(--border); padding:6px 10px; border-radius:999px}
+    /* ===== Table ===== */
+    .tblWrap{max-height:60svh;overflow:auto}
+    table{width:100%;border-collapse:separate;border-spacing:0;min-width:600px}
+    thead th{position:sticky;top:0;z-index:30;padding:4px;text-align:left;font-size:.7rem;color:var(--table-head-text);background:var(--head-dark)}
+    tbody td{padding:6px;border-bottom:1px solid var(--border);font-size:.8rem}
+    tbody tr:nth-child(odd){background:#f9f9fb}
+    tbody tr:nth-child(even){background:#ececef}
+    :root[data-theme="dark"] tbody tr:nth-child(odd){background:#2c2c2e}
+    :root[data-theme="dark"] tbody tr:nth-child(even){background:#3a3a3c}
 
-    .running{overflow:hidden; white-space:nowrap; mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent)}
-    .running span{display:inline-block; padding-left:24px; animation:marquee 18s linear infinite}
-    @keyframes marquee{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+    .nameBadge{padding:2px 6px;border-radius:4px;font-weight:700}
+    .nameBadge.green{background:#28cd41;color:#fff}
+    .nameBadge.red{background:#ff3b30;color:#fff}
+    .nameBadge.yellow{background:#ffcc00;color:#111}
 
-    /* ====== Formulaire ====== */
-    form.add{
-      display:grid; grid-template-columns:repeat(6,1fr) auto; gap:10px; padding:10px; align-items:end; background:#fff; border-bottom:1px solid var(--border);
-    }
-    :root[data-theme="dark"] form.add,
-    :root[data-theme="auto"][style*="--mode:dark"] form.add{ background:#19191c; }
-    label{font-size:.8rem; color:var(--sub); display:block; margin:0 0 6px}
-    input, select{
-      width:100%; height:44px; padding:10px 12px; border-radius:12px; border:1px solid var(--border); background:#fff; color:var(--ink);
-    }
-    :root[data-theme="dark"] input, :root[data-theme="dark"] select,
-    :root[data-theme="auto"][style*="--mode:dark"] input,
-    :root[data-theme="auto"][style*="--mode:dark"] select{ background:#141416; color:var(--ink); border-color:#2a2a2d; }
-    input:focus, select:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,122,255,.15)}
-    :root[data-theme="dark"] input:focus, :root[data-theme="dark"] select:focus,
-    :root[data-theme="auto"][style*="--mode:dark"] input:focus,
-    :root[data-theme="auto"][style*="--mode:dark"] select:focus{ box-shadow:0 0 0 3px rgba(10,132,255,.2) }
-    .err{color:#b10000; font-size:.8rem; margin-top:6px}
+    /* ===== Footer ===== */
+    .fabBar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(250,250,252,.96);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:6px;display:flex;gap:6px}
+    .fabBar .btn{flex:1}
 
-    @media (max-width:700px){
-      form.add{grid-template-columns:1fr 1fr; grid-auto-rows:auto}
-      .hide-on-mobile{display:none!important}
-    }
-
-    /* ====== Table ====== */
-    .tblWrap{
-      max-height: min(62svh, 560px);
-      overflow:auto; -webkit-overflow-scrolling:touch; border-top:1px solid var(--border);
-      background:#fff;
-    }
-    :root[data-theme="dark"] .tblWrap,
-    :root[data-theme="auto"][style*="--mode:dark"] .tblWrap{ background:#161618; }
-
-    table{width:100%; border-collapse:separate; border-spacing:0; min-width:900px}
-    thead th{
-      position:sticky; top:0; z-index:30; padding:10px 12px; text-align:left; font-size:.85rem; color:var(--table-head-text);
-      background:var(--head-dark); border-bottom:1px solid #2c2c2e;
-    }
-    tbody td{padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle}
-
-    tbody tr:nth-child(odd){ background:var(--zebra-dark); color:#f5f5f7 }
-    tbody tr:nth-child(even){ background:var(--zebra-mid); color:#111 }
-    tbody tr:hover{outline:2px solid var(--hover-outline); outline-offset:-2px}
-
-    .nameBadge{
-      display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:9px; border:1px solid var(--border);
-      background:#fff; color:#111; font-weight:650;
-    }
-    :root[data-theme="dark"] .nameBadge,
-    :root[data-theme="auto"][style*="--mode:dark"] .nameBadge{ background:#141416; color:var(--ink); border-color:#2a2a2d; }
-    .nameBadge.green{background:#e8fbe9; border-color:#b8eabf}
-    .nameBadge.yellow{background:#fff5e5; border-color:#ffd79a}
-    .nameBadge.red{background:#ffecec; border-color:#ffc9c9}
-    :root[data-theme="dark"] .nameBadge.green,
-    :root[data-theme="auto"][style*="--mode:dark"] .nameBadge.green{background:rgba(48,209,88,.15); border-color:rgba(48,209,88,.35)}
-    :root[data-theme="dark"] .nameBadge.yellow,
-    :root[data-theme="auto"][style*="--mode:dark"] .nameBadge.yellow{background:rgba(255,214,10,.16); border-color:rgba(255,214,10,.4)}
-    :root[data-theme="dark"] .nameBadge.red,
-    :root[data-theme="auto"][style*="--mode:dark"] .nameBadge.red{background:rgba(255,69,58,.16); border-color:rgba(255,69,58,.4)}
-
-    .presentCell input[type="checkbox"]{transform:scale(1.25)}
-    .money{display:flex; align-items:center; gap:8px}
-    .money input[type="number"]{max-width:140px}
-    .rowActions{display:flex; gap:8px; align-items:center}
-    .mini{height:36px; padding:0 10px; border-radius:10px}
-    .hiddenCol{display:none}
-
-    /* ====== Barre d’actions basse ====== */
-    .fabBar{
-      position:fixed; left:0; right:0; bottom:0; z-index:50;
-      background:rgba(250,250,252,.96); backdrop-filter:saturate(1.1) blur(10px);
-      border-top:1px solid var(--border);
-      padding:10px calc(12px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
-      display:flex; gap:8px; align-items:center; justify-content:space-between;
-    }
-    :root[data-theme="dark"] .fabBar,
-    :root[data-theme="auto"][style*="--mode:dark"] .fabBar{ background:rgba(22,22,24,.92); border-top:1px solid #2a2a2d; }
-    .fabBar .btn{flex:1 1 auto}
-
-    /* ====== Sheets ====== */
-    .sheet{
-      position:fixed; left:0; right:0; bottom:0; z-index:60; background:var(--sheet-bg); color:var(--sheet-text);
-      border-radius:16px 16px 0 0; box-shadow:0 -10px 30px rgba(0,0,0,.2); transform:translateY(100%); transition:transform .25s ease;
-      padding:12px 14px calc(12px + env(safe-area-inset-bottom)); max-height:70svh; overflow:auto; -webkit-overflow-scrolling:touch;
-    }
+    /* ===== Sheet ===== */
+    .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sheet-bg);color:var(--sheet-text);border-radius:12px 12px 0 0;box-shadow:0 -4px 12px rgba(0,0,0,.2);transform:translateY(100%);transition:.25s;padding:12px;max-height:70svh;overflow:auto}
     .sheet.show{transform:translateY(0)}
-    .sheet h3{margin:6px 0 10px; font-size:1.05rem}
-    .sheet .row{display:grid; grid-template-columns:120px 1fr; gap:10px; align-items:center; margin-bottom:10px}
-    .sheet .actions{display:flex; gap:8px; justify-content:flex-end; margin-top:8px}
-    .sheet .btn.full{width:100%}
+    .sheet .row{display:grid;grid-template-columns:100px 1fr;gap:8px;margin-bottom:8px}
+    .sheet .actions{display:flex;gap:6px;justify-content:flex-end}
 
-    /* ====== Toast ====== */
-    .toast{
-      position:fixed; bottom:calc(var(--fab-h) + 16px + env(safe-area-inset-bottom)); right:16px; background:var(--toast-bg); color:var(--toast-fg);
-      padding:10px 14px; border-radius:10px; box-shadow:0 10px 24px rgba(0,0,0,.25); opacity:0; transform:translateY(10px); transition:.25s; z-index:80;
-    }
-    .toast.show{opacity:1; transform:translateY(0)}
+    .toast{position:fixed;bottom:80px;right:16px;background:var(--toast-bg);color:var(--toast-fg);padding:8px 12px;border-radius:8px;opacity:0;transition:.25s}
+    .toast.show{opacity:1}
   </style>
 </head>
 <body>
-  <header>
-    <h1>Présence & Paiements — iPhone</h1>
-  </header>
-
-  <div class="wrap">
-    <div class="card">
-
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <div class="left">
-          <input id="search" class="search" placeholder="Recherche (nom, tel, mail)..." />
-        </div>
-        <div class="right">
-          <div class="seg" role="tablist" aria-label="Thème">
-            <button id="themeAuto"  class="active" role="tab" aria-selected="true">Auto</button>
-            <button id="themeLight" role="tab" aria-selected="false">Clair</button>
-            <button id="themeDark"  role="tab" aria-selected="false">Sombre</button>
-          </div>
-          <button class="btn" id="btnOptions">Options</button>
-          <button class="btn" id="btnImport">Importer CSV</button>
-        </div>
+<header>
+  <h1>TDTL v2.0</h1>
+</header>
+<div class="wrap">
+  <div class="card">
+    <div class="toolbar">
+      <input id="search" class="search" placeholder="Recherche..." />
+      <div class="seg">
+        <button id="themeAuto" class="active">Auto</button>
+        <button id="themeLight">Clair</button>
+        <button id="themeDark">Sombre</button>
       </div>
-
-      <!-- Bandeau stats -->
-      <div class="displayBar">
-        <span class="pill">Présents: <strong id="statPresents">0</strong></span>
-        <span class="pill">Total: <strong id="statTotal">0,00 €</strong></span>
-        <div class="running"><span id="marqueeNames">—</span></div>
-      </div>
-
-      <!-- Formulaire -->
-      <form class="add" id="addForm" novalidate>
-        <div>
-          <label for="prenom">Prénom</label>
-          <input id="prenom" required placeholder="Jean" autocomplete="given-name" />
-          <div class="err" id="errPrenom"></div>
-        </div>
-        <div>
-          <label for="nom">Nom</label>
-          <input id="nom" required placeholder="Dupont" autocomplete="family-name" />
-          <div class="err" id="errNom"></div>
-        </div>
-        <div id="col-tel" class="hide-on-mobile">
-          <label for="tel">Téléphone (04XXXXXXXX)</label>
-          <input id="tel" inputmode="numeric" pattern="^04\\d{8}$" placeholder="04XXXXXXXX" maxlength="10" />
-          <div class="err" id="errTel"></div>
-        </div>
-        <div id="col-mail" class="hide-on-mobile">
-          <label for="mail">E-mail</label>
-          <input id="mail" type="email" placeholder="ex: joueur@mail.fr" autocomplete="email" />
-          <div class="err" id="errMail"></div>
-        </div>
-        <div>
-          <label for="montant">Montant (€)</label>
-          <input id="montant" type="number" inputmode="decimal" min="0" step="0.01" placeholder="ex. 5" />
-        </div>
-        <div>
-          <label for="present">Présent ?</label>
-          <select id="present">
-            <option value="false">Non</option>
-            <option value="true">Oui</option>
-          </select>
-        </div>
-        <button class="btn primary" type="submit">Ajouter</button>
-      </form>
-
-      <!-- Liste -->
-      <div class="tblWrap">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th style="width:44px"><input type="checkbox" id="selectAll" /></th>
-              <th>Nom & Prénom (éditables)</th>
-              <th class="th-tel">Téléphone</th>
-              <th class="th-mail">E-mail</th>
-              <th class="presentCell">Présent</th>
-              <th>Paiement (€)</th>
-              <th style="width:120px">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-
-      <div id="empty" class="empty" style="display:none; padding:16px; text-align:center; color:var(--sub)">Aucun joueur.</div>
+      <button class="btn" id="btnImport">Importer</button>
+      <button class="btn" id="btnOptions">Options</button>
+    </div>
+    <div class="displayBar">
+      <span class="pill">Présents: <strong id="statPresents">0</strong></span>
+      <span class="pill">Total: <strong id="statTotal">0,00 €</strong></span>
+    </div>
+    <form class="add" id="addForm">
+      <div><label>Prénom</label><input id="prenom" required></div>
+      <div><label>Nom</label><input id="nom" required></div>
+      <div><label>Tel</label><input id="tel"></div>
+      <div><label>Mail</label><input id="mail"></div>
+      <div><label>Montant</label><input id="montant" type="number"></div>
+      <div><label>Présent</label><select id="present"><option value="false">Non</option><option value="true">Oui</option></select></div>
+      <button class="btn primary" type="submit">+</button>
+    </form>
+    <div class="tblWrap">
+      <table>
+        <thead><tr><th></th><th>Nom & Prénom</th><th>Présent</th><th>Montant</th><th>Actions</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
     </div>
   </div>
-
-  <!-- Barre d’actions basse -->
-  <div class="fabBar">
-    <button class="btn danger" id="deleteSelected">Supprimer sélection</button>
-    <button class="btn" id="exportNamesAmounts">Exporter Noms+Montants</button>
-    <button class="btn primary" id="saveAll">Sauver</button>
+</div>
+<div class="fabBar">
+  <button class="btn danger" id="deleteSelected">Supprimer</button>
+  <button class="btn" id="exportBtn">Exporter</button>
+  <button class="btn primary" id="saveBtn">Sauver</button>
+</div>
+<div id="sheetRow" class="sheet">
+  <h3>Éditer</h3>
+  <div class="row"><label>Nom</label><input id="rowNom"></div>
+  <div class="row"><label>Prénom</label><input id="rowPrenom"></div>
+  <div class="row"><label>Tel</label><input id="rowTel"></div>
+  <div class="row"><label>Mail</label><input id="rowMail"></div>
+  <div class="actions">
+    <button class="btn danger" id="rowDelete">Supprimer</button>
+    <button class="btn" id="rowCancel">Annuler</button>
+    <button class="btn primary" id="rowSave">Enregistrer</button>
   </div>
-
-  <!-- Sheet Options -->
-  <div id="sheetOptions" class="sheet" aria-hidden="true">
-    <h3>Options</h3>
-    <div class="row">
-      <label>Colonne Téléphone</label>
-      <button class="btn" id="toggleTel">Masquer</button>
-    </div>
-    <div class="row">
-      <label>Colonne E-mail</label>
-      <button class="btn" id="toggleMail">Masquer</button>
-    </div>
-    <div class="row">
-      <label>Import CSV</label>
-      <input type="file" id="csvFile" accept=".csv,text/csv" />
-    </div>
-    <div class="row">
-      <label>Mode import</label>
-      <select id="importMode">
-        <option value="append">Ajouter à la liste</option>
-        <option value="replace">Remplacer la liste</option>
-      </select>
-    </div>
-    <div class="actions">
-      <button class="btn" id="closeOptions">Fermer</button>
-      <button class="btn primary" id="importCsvBtn">Importer</button>
-    </div>
-  </div>
-
-  <!-- Sheet Ligne -->
-  <div id="sheetRow" class="sheet" aria-hidden="true">
-    <h3 id="rowTitle">Détails du membre</h3>
-    <div class="row">
-      <label>Téléphone</label>
-      <input id="rowTel" inputmode="numeric" pattern="^04\\d{8}$" maxlength="10" placeholder="04XXXXXXXX" />
-    </div>
-    <div class="row">
-      <label>E-mail</label>
-      <input id="rowMail" type="email" placeholder="ex: joueur@mail.fr" />
-    </div>
-    <div class="actions">
-      <button class="btn danger" id="rowDelete">Supprimer</button>
-      <button class="btn" id="rowCancel">Annuler</button>
-      <button class="btn primary" id="rowSave">Enregistrer</button>
-    </div>
-  </div>
-
-  <div id="toast" class="toast">Sauvegardé ✔️</div>
-
-  <script>
-    // ====== Helpers ======
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
-    const fmt = n => (Number(n)||0).toLocaleString('fr-FR',{minimumFractionDigits:2, maximumFractionDigits:2});
-    const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'id_'+Math.random().toString(36).slice(2));
-    const STORAGE_KEY = 'ping_presence_v6_theme_manual';
-    const THEME_KEY = 'ping_presence_theme_mode'; // 'auto' | 'light' | 'dark'
-    const themeMeta = document.getElementById('themeColorMeta');
-    const mediaDark = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const phoneValid = v => /^04\d{8}$/.test(String(v||'').trim());
-    const emailValid = v => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v||'').trim());
-    const toast = (msg='Sauvegardé ✔️') => { const t=$('#toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); };
-
-    // ====== Theme handling ======
-    function getThemeMode(){ return localStorage.getItem(THEME_KEY) || 'auto'; }
-    function setThemeMode(mode){
-      document.documentElement.setAttribute('data-theme', mode);
-      // hack CSS var pour différencier auto clair/sombre dans certains selecteurs
-      document.documentElement.style.setProperty('--mode', (mode==='dark'||(mode==='auto'&&mediaDark.matches))?'dark':'light');
-      // meta theme-color (peut être affiné si tu veux une couleur différente en sombre)
-      themeMeta.setAttribute('content', '#0a84ff');
-      localStorage.setItem(THEME_KEY, mode);
-      // Segmented UI state
-      $('#themeAuto').classList.toggle('active', mode==='auto');
-      $('#themeLight').classList.toggle('active', mode==='light');
-      $('#themeDark').classList.toggle('active', mode==='dark');
-      $('#themeAuto').setAttribute('aria-selected', mode==='auto');
-      $('#themeLight').setAttribute('aria-selected', mode==='light');
-      $('#themeDark').setAttribute('aria-selected', mode==='dark');
-    }
-    mediaDark.addEventListener?.('change', ()=>{ if(getThemeMode()==='auto'){ setThemeMode('auto'); } });
-
-    // ====== State ======
-    let state = loadState();
-    function loadState(){
-      try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); }catch(e){}
-      return {
-        players:[
-          {id:uid(), prenom:'Anna', nom:'Martin', tel:'0412345678', mail:'anna@club.fr', present:true,  montant:5},
-          {id:uid(), prenom:'Léo',  nom:'Durand', tel:'0498765432', mail:'',             present:true,  montant:null},
-          {id:uid(), prenom:'Sara', nom:'Bernard',tel:'0411122233', mail:'sara@mail.fr', present:false, montant:0},
-        ],
-        hideTel:true, hideMail:true
-      };
-    }
-    function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-
-    // ====== Rendering ======
-    function badgeClass(present, montant){
-      if(!present) return '';
-      if(montant===null || montant==='' || typeof montant==='undefined') return 'yellow';
-      const m = Number(montant);
-      if(isNaN(m)) return 'yellow';
-      if(m===0) return 'red';
-      if(m>0) return 'green';
-      return '';
-    }
-
-    function render(){
-      $('#toggleTel').textContent = state.hideTel ? 'Afficher' : 'Masquer';
-      $('#toggleMail').textContent = state.hideMail ? 'Afficher' : 'Masquer';
-      $('.th-tel')?.classList.toggle('hiddenCol', state.hideTel);
-      $('.th-mail')?.classList.toggle('hiddenCol', state.hideMail);
-
-      const q = $('#search').value.trim().toLowerCase();
-      const tbody = $('#tbody'); tbody.textContent = '';
-      const filtered = state.players.filter(p=>{
-        const hay = `${p.nom} ${p.prenom} ${p.tel||''} ${p.mail||''}`.toLowerCase();
-        return hay.includes(q);
-      });
-
-      let rows = 0;
-      for(const p of filtered){
-        rows++;
-        const tr = document.createElement('tr');
-
-        const tdSel = document.createElement('td');
-        const sel = document.createElement('input'); sel.type='checkbox'; sel.className='rowSel'; sel.dataset.id=p.id;
-        tdSel.appendChild(sel); tr.appendChild(tdSel);
-
-        const tdName = document.createElement('td');
-        const bc = badgeClass(p.present, p.montant);
-        const badge = document.createElement('span'); badge.className='nameBadge'+(bc?(' '+bc):'');
-        badge.textContent = `${p.nom.toUpperCase()} ${p.prenom}`;
-        const box = document.createElement('div'); box.style.display='flex'; box.style.gap='8px'; box.style.alignItems='center'; box.style.flexWrap='wrap';
-        const inNom = document.createElement('input'); inNom.value=p.nom; inNom.title='Nom'; inNom.style.maxWidth='160px';
-        const inPre = document.createElement('input'); inPre.value=p.prenom; inPre.title='Prénom'; inPre.style.maxWidth='160px';
-        inNom.addEventListener('change', ()=>{ if(!inNom.value.trim()){ alert('Nom requis.'); inNom.value=p.nom; return; } p.nom=inNom.value.trim(); save(); render(); });
-        inPre.addEventListener('change', ()=>{ if(!inPre.value.trim()){ alert('Prénom requis.'); inPre.value=p.prenom; return; } p.prenom=inPre.value.trim(); save(); render(); });
-        box.append(badge,inNom,inPre); tdName.appendChild(box); tr.appendChild(tdName);
-
-        const tdTel = document.createElement('td'); tdTel.className = state.hideTel ? 'hiddenCol' : '';
-        const tel = document.createElement('input'); tel.placeholder='04XXXXXXXX'; tel.maxLength=10; tel.inputMode='numeric'; tel.value=p.tel||'';
-        tel.addEventListener('change', ()=>{ if(tel.value && !phoneValid(tel.value)){ alert('Téléphone invalide (04 + 8 chiffres).'); tel.value=p.tel||''; return; } p.tel=tel.value.trim(); save(); render(); });
-        tdTel.appendChild(tel); tr.appendChild(tdTel);
-
-        const tdMail = document.createElement('td'); tdMail.className = state.hideMail ? 'hiddenCol' : '';
-        const mail = document.createElement('input'); mail.type='email'; mail.placeholder='ex: joueur@mail.fr'; mail.value=p.mail||'';
-        mail.addEventListener('change', ()=>{ if(mail.value && !emailValid(mail.value)){ alert('E-mail invalide.'); mail.value=p.mail||''; return; } p.mail=mail.value.trim(); save(); render(); });
-        tdMail.appendChild(mail); tr.appendChild(tdMail);
-
-        const tdPres = document.createElement('td'); tdPres.className='presentCell';
-        const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=!!p.present;
-        cb.addEventListener('change', ()=>{ p.present=cb.checked; save(); render(); });
-        tdPres.appendChild(cb); tr.appendChild(tdPres);
-
-        const tdMoney = document.createElement('td'); tdMoney.className='money';
-        const m = document.createElement('input'); m.type='number'; m.inputMode='decimal'; m.min='0'; m.step='0.01'; m.placeholder='ex. 5';
-        m.value = (p.montant===null || typeof p.montant==='undefined') ? '' : String(p.montant);
-        m.addEventListener('input', ()=>{ const v=m.value.trim(); p.montant = v==='' ? null : Number(v); save(); render(); });
-        const clear = document.createElement('button'); clear.className='btn mini'; clear.type='button'; clear.textContent='Effacer';
-        clear.addEventListener('click', ()=>{ p.montant=null; save(); render(); });
-        tdMoney.append(m, clear); tr.appendChild(tdMoney);
-
-        const tdAct = document.createElement('td'); tdAct.className='rowActions';
-        const more = document.createElement('button'); more.className='btn mini'; more.type='button'; more.textContent='⋯';
-        more.addEventListener('click', ()=> openRowSheet(p.id));
-        const del = document.createElement('button'); del.className='btn mini danger'; del.type='button'; del.textContent='Suppr';
-        del.addEventListener('click', ()=>{ if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){ state.players = state.players.filter(x=>x.id!==p.id); save(); render(); } });
-        tdAct.append(more, del); tr.appendChild(tdAct);
-
-        tbody.appendChild(tr);
-      }
-
-      $('#empty').style.display = rows ? 'none' : 'block';
-
-      const presents = state.players.filter(p=>p.present);
-      const total = presents.reduce((s,p)=> s + (Number(p.montant)>0 ? Number(p.montant) : 0), 0);
-      $('#statPresents').textContent = String(presents.length);
-      $('#statTotal').textContent = fmt(total)+' €';
-      const names = presents.map(p=>`${p.nom.toUpperCase()} ${p.prenom}`).join(' • ');
-      $('#marqueeNames').textContent = names ? (names + ' • ' + names) : '—';
-    }
-
-    // ====== Row sheet ======
-    let currentRowId = null;
-    function openRowSheet(id){
-      currentRowId = id;
-      const p = state.players.find(x=>x.id===id); if(!p) return;
-      $('#rowTitle').textContent = `${p.nom.toUpperCase()} ${p.prenom}`;
-      $('#rowTel').value = p.tel || '';
-      $('#rowMail').value = p.mail || '';
-      $('#sheetRow').classList.add('show');
-      $('#sheetRow').setAttribute('aria-hidden','false');
-    }
-    function closeRowSheet(){
-      $('#sheetRow').classList.remove('show');
-      $('#sheetRow').setAttribute('aria-hidden','true');
-      currentRowId = null;
-    }
-    $('#rowCancel').addEventListener('click', closeRowSheet);
-    $('#rowSave').addEventListener('click', ()=>{
-      if(!currentRowId) return;
-      const p = state.players.find(x=>x.id===currentRowId); if(!p) return;
-      const tel = $('#rowTel').value.trim();
-      const mail = $('#rowMail').value.trim();
-      if(tel && !phoneValid(tel)){ alert('Téléphone invalide (04 + 8 chiffres).'); return; }
-      if(mail && !emailValid(mail)){ alert('E-mail invalide.'); return; }
-      p.tel = tel; p.mail = mail; save(); render(); toast('Modifié ✔️'); closeRowSheet();
-    });
-    $('#rowDelete').addEventListener('click', ()=>{
-      if(!currentRowId) return;
-      const p = state.players.find(x=>x.id===currentRowId); if(!p) return;
-      if(confirm(`Supprimer ${p.prenom} ${p.nom} ?`)){
-        state.players = state.players.filter(x=>x.id!==p.id); save(); render(); closeRowSheet();
-      }
-    });
-
-    // ====== Form events ======
-    $('#addForm').addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const prenom = $('#prenom').value.trim();
-      const nom = $('#nom').value.trim();
-      const tel = $('#tel').value.trim();
-      const mail = $('#mail').value.trim();
-      const present = $('#present').value === 'true';
-      const montantRaw = $('#montant').value.trim();
-      const montant = (montantRaw==='' ? null : Number(montantRaw));
-
-      $('#errPrenom').textContent = $('#errNom').textContent = $('#errTel').textContent = $('#errMail').textContent = '';
-
-      let ok = true;
-      if(!prenom){ $('#errPrenom').textContent='Prénom requis.'; ok=false; }
-      if(!nom){ $('#errNom').textContent='Nom requis.'; ok=false; }
-      if(tel && !phoneValid(tel)){ $('#errTel').textContent='Doit commencer par 04 et contenir 10 chiffres.'; ok=false; }
-      if(mail && !emailValid(mail)){ $('#errMail').textContent='E-mail invalide.'; ok=false; }
-      if(!ok) return;
-
-      state.players.unshift({ id:uid(), prenom, nom, tel, mail, present, montant });
-      save();
-      e.target.reset(); $('#present').value='false';
-      render();
-      toast('Ajouté ✔️');
-    });
-
-    $('#search').addEventListener('input', render);
-    $('#selectAll').addEventListener('change', e=> $$('.rowSel').forEach(cb=> cb.checked=e.target.checked));
-
-    // Supprimer sélection
-    $('#deleteSelected').addEventListener('click', ()=>{
-      const ids = $$('.rowSel:checked').map(cb=>cb.dataset.id);
-      if(ids.length===0){ alert('Sélectionnez au moins un membre.'); return; }
-      if(confirm(`Supprimer ${ids.length} membre(s) ?`)){
-        state.players = state.players.filter(p=>!ids.includes(p.id)); save(); render(); toast('Supprimé ✔️');
-      }
-    });
-
-    // Sauver
-    $('#saveAll').addEventListener('click', ()=>{ save(); toast('Sauvegardé ✔️'); });
-
-    // Export (noms + montants) — partage iOS si dispo
-    $('#exportNamesAmounts').addEventListener('click', async ()=>{
-      if(state.players.length===0){ alert('Rien à exporter.'); return; }
-      const headers = ['Nom complet','Montant'];
-      const rows = state.players.map(p=>[
-        csvEscape(`${p.nom} ${p.prenom}`.trim()),
-        (p.montant===null || typeof p.montant==='undefined') ? '' : String(p.montant)
-      ]);
-      const csv = [headers.join(';')].concat(rows.map(r=>r.join(';'))).join('\n');
-      const filename = 'noms_montants.csv';
-      try{
-        if(navigator.canShare && navigator.canShare({ files:[new File([csv], filename, {type:'text/csv'})]})){
-          await navigator.share({ files:[new File([csv], filename, {type:'text/csv'})], title:'Export', text:'Noms + Montants' });
-        }else{
-          downloadCsv(csv, filename);
-        }
-      }catch{ downloadCsv(csv, filename); }
-    });
-
-    function csvEscape(s){ s=String(s); return /[;"\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
-    function downloadCsv(content, filename){
-      const blob = new Blob([content], {type:'text/csv;charset=utf-8;'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-    }
-
-    // ====== Options (sheet) ======
-    const sheet = $('#sheetOptions');
-    $('#btnOptions').addEventListener('click', ()=>{ sheet.classList.add('show'); sheet.setAttribute('aria-hidden','false'); });
-    $('#closeOptions').addEventListener('click', ()=>{ sheet.classList.remove('show'); sheet.setAttribute('aria-hidden','true'); });
-
-    $('#toggleTel').addEventListener('click', ()=>{ state.hideTel = !state.hideTel; save(); render(); });
-    $('#toggleMail').addEventListener('click', ()=>{ state.hideMail = !state.hideMail; save(); render(); });
-
-    // Import - ouverture rapide
-    $('#btnImport').addEventListener('click', ()=>{ sheet.classList.add('show'); sheet.setAttribute('aria-hidden','false'); $('#csvFile').focus(); });
-
-    // Import CSV
-    $('#importCsvBtn').addEventListener('click', ()=>{
-      const file = $('#csvFile').files[0];
-      if(!file){ alert('Choisissez un fichier CSV.'); return; }
-      const mode = $('#importMode').value; // append | replace
-      const reader = new FileReader();
-      reader.onload = ()=>{
-        try{
-          const text = reader.result;
-          const parsed = parseCsvSmart(text);
-          if(parsed.length===0){ alert('CSV vide.'); return; }
-          const mapped = mapCsvRows(parsed);
-          const valid = [];
-          for(const r of mapped){
-            const prenom = (r.prenom||'').trim();
-            const nom = (r.nom||'').trim();
-            const tel = (r.tel||'').trim();
-            const mail = (r.mail||'').trim();
-            const present = !!r.present;
-            const montant = (r.montant==='' || r.montant===null || typeof r.montant==='undefined') ? null : Number(r.montant);
-            if(!prenom || !nom) continue;
-            if(tel && !phoneValid(tel)) continue;
-            if(mail && !emailValid(mail)) continue;
-            valid.push({ id:uid(), prenom, nom, tel, mail, present, montant });
-          }
-          if(valid.length===0){ alert('Aucune ligne valide.'); return; }
-          state.players = (mode==='replace') ? valid : valid.concat(state.players);
-          save(); render(); toast(`Importé ${valid.length} ✔️`);
-          sheet.classList.remove('show'); sheet.setAttribute('aria-hidden','true');
-        }catch(err){ alert('Erreur CSV : '+err.message); }
-      };
-      reader.readAsText(file, 'utf-8');
-    });
-
-    // ====== CSV parsing ======
-    function parseCsvSmart(text){
-      const semi=(text.match(/;/g)||[]).length, comma=(text.match(/,/g)||[]).length;
-      const sep = semi>=comma ? ';' : ',';
-      const rows=[], row=[]; let field='', i=0, inQ=false;
-      const pushField=()=>{ row.push(field); field=''; };
-      const pushRow=()=>{ rows.push(row.slice()); row.length=0; };
-      while(i<text.length){
-        const c=text[i];
-        if(inQ){
-          if(c=='"'){ if(text[i+1]=='"'){ field+='"'; i++; } else { inQ=false; } }
-          else field+=c;
-        }else{
-          if(c=='"') inQ=true;
-          else if(c==sep) pushField();
-          else if(c=='\n'){ pushField(); pushRow(); }
-          else if(c=='\r'){ /* skip */ }
-          else field+=c;
-        }
-        i++;
-      }
-      pushField(); if(row.length>1 || row[0]!=='') pushRow();
-      return rows.map(r=>r.map(x=>(x??'').trim())).filter(r=>r.some(x=>x!==''));
-    }
-    function mapCsvRows(rows){
-      if(rows.length===0) return [];
-      const header = rows[0].map(h=>h.toLowerCase());
-      const looksHeader = header.some(h=>['nom','prénom','prenom','téléphone','telephone','email','e-mail','present','présent','montant','paid','amount'].includes(h));
-      const data = looksHeader ? rows.slice(1) : rows;
-      const find = names => header.findIndex(x=>names.includes(x));
-      const idx = {
-        nom:     find(['nom','name','last','lastname','surname']),
-        prenom:  find(['prénom','prenom','first','firstname','given']),
-        tel:     find(['téléphone','telephone','tel','phone','mobile']),
-        mail:    find(['email','e-mail','mail']),
-        present: find(['présent','present','presence']),
-        montant: find(['montant','paid','paiement','payment','amount','somme'])
-      };
-      const get = (r, i, defIdx)=> (i!=null && i>=0 ? r[i] : r[defIdx] || '');
-      const normPresent = v => ['1','true','oui','o','y','yes','present','présent'].includes(String(v||'').toLowerCase());
-      const normNum = v => { let s=String(v??'').trim(); if(!s) return null; s=s.replace(/\s/g,'').replace(',', '.'); const n=Number(s); return isNaN(n)?null:n; };
-      return data.map(r=>({
-        nom: get(r, idx.nom, 0), prenom: get(r, idx.prenom, 1),
-        tel: get(r, idx.tel, 2), mail: get(r, idx.mail, 3),
-        present: normPresent(get(r, idx.present, 4)),
-        montant: normNum(get(r, idx.montant, 5))
-      }));
-    }
-
-    // ====== Init ======
-    setThemeMode(getThemeMode());
-    $('#themeAuto').addEventListener('click', ()=> setThemeMode('auto'));
-    $('#themeLight').addEventListener('click', ()=> setThemeMode('light'));
-    $('#themeDark').addEventListener('click', ()=> setThemeMode('dark'));
-
-    render();
-    // Astuce iOS : recadre après fermeture clavier
-    window.addEventListener('focusout', ()=> { setTimeout(()=>window.scrollTo(0,document.documentElement.scrollTop||0), 50); });
-  </script>
+</div>
+<div id="toast" class="toast">✔️</div>
+<script>
+const $=s=>document.querySelector(s);
+const STORAGE_KEY="tdtl_v2";
+let state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"players":[]}');
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1500)}
+function badgeClass(p){if(!p.present)return"";if(p.montant==null)return"yellow";if(p.montant==0)return"red";if(p.montant>0)return"green";return""}
+function render(){
+  const tb=$("#tbody");tb.innerHTML="";
+  let total=0,pres=0;
+  for(const pl of state.players){
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><input type="checkbox" data-id="${pl.id}"></td>
+      <td><span class="nameBadge ${badgeClass(pl)}"></span> ${pl.nom.toUpperCase()} ${pl.prenom}</td>
+      <td><input type="checkbox" data-pres="${pl.id}" ${pl.present?"checked":""}></td>
+      <td><input type="number" data-montant="${pl.id}" value="${pl.montant??""}" style="width:70px"></td>
+      <td><button class="btn" data-edit="${pl.id}">✎</button></td>`;
+    tb.appendChild(tr);
+    if(pl.present){pres++;total+=pl.montant||0}
+  }
+  $("#statPresents").textContent=pres;
+  $("#statTotal").textContent=total.toFixed(2)+" €";
+}
+function addPlayer(prenom,nom,tel,mail,present,montant){
+  state.players.push({id:crypto.randomUUID(),prenom,nom,tel,mail,present,montant:montant?+montant:null});
+  save();render();
+}
+$("#addForm").onsubmit=e=>{
+  e.preventDefault();
+  addPlayer($("#prenom").value,$("#nom").value,$("#tel").value,$("#mail").value,$("#present").value==="true",$("#montant").value);
+  e.target.reset();
+}
+$("#tbody").onchange=e=>{
+  const id=e.target.dataset.pres||e.target.dataset.montant;
+  const pl=state.players.find(p=>p.id===id);
+  if(!pl)return;
+  if(e.target.dataset.pres!==undefined)pl.present=e.target.checked;
+  if(e.target.dataset.montant!==undefined)pl.montant=e.target.value?+e.target.value:null;
+  save();render();
+};
+$("#tbody").onclick=e=>{
+  const id=e.target.dataset.edit;
+  if(!id)return;
+  const pl=state.players.find(p=>p.id===id);
+  $("#rowNom").value=pl.nom;$("#rowPrenom").value=pl.prenom;$("#rowTel").value=pl.tel;$("#rowMail").value=pl.mail;
+  $("#sheetRow").classList.add("show");
+  $("#rowSave").onclick=()=>{pl.nom=$("#rowNom").value;pl.prenom=$("#rowPrenom").value;pl.tel=$("#rowTel").value;pl.mail=$("#rowMail").value;save();render();$("#sheetRow").classList.remove("show")};
+  $("#rowCancel").onclick=()=>$("#sheetRow").classList.remove("show");
+  $("#rowDelete").onclick=()=>{state.players=state.players.filter(p=>p.id!==id);save();render();$("#sheetRow").classList.remove("show")};
+};
+$("#deleteSelected").onclick=()=>{
+  const ids=[...document.querySelectorAll("#tbody input[type=checkbox]:checked")].map(c=>c.dataset.id).filter(Boolean);
+  state.players=state.players.filter(p=>!ids.includes(p.id));save();render();
+};
+$("#exportBtn").onclick=()=>{
+  let csv="Nom;Prénom;Montant\n";
+  state.players.forEach(p=>csv+=`${p.nom};${p.prenom};${p.montant??""}\n`);
+  const blob=new Blob([csv],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="export.csv";a.click();
+};
+$("#saveBtn").onclick=()=>{save();toast("Sauvegardé ✔️")};
+render();
+</script>
 </body>
 </html>
