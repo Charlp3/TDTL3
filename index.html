@@ -781,62 +781,41 @@ tbody tr.state-green * { background-color: transparent; }
   if(!btn) return;
   btn.onclick = null;
 
-  function updateCounters(){
-    var tbody = document.querySelector("tbody"); if(!tbody) return;
-    var present = 0, total = 0;
-    tbody.querySelectorAll("tr").forEach(function(tr){
-      var cb = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
-      var euro = tr.querySelector('.amount input, input.euro');
-      if(cb && cb.checked) present += 1;
-      if(euro){
-        var v = parseFloat(String(euro.value||"").replace(",", "."));
-        if(!isNaN(v)) total += v;
-      }
-    });
-    var cp = document.getElementById("countPresent");
-    var te = document.getElementById("totalEuro");
-    if(cp) cp.textContent = String(present);
-    if(te) te.textContent = String(total).replace('.', ',');
-  }
-  function setRowClass(tr, cls){
-    tr.classList.remove("state-yellow","state-red","state-green");
-    if(cls) tr.classList.add(cls);
-  }
+ function updateCounters(){
+  const tbody = document.querySelector("tbody");
+  if(!tbody) return;
 
-  let guard = false;
-  document.addEventListener("click", function(ev){
-    var el = ev.target.closest && ev.target.closest("#resetRoster");
-    if(!el) return;
-    ev.preventDefault(); ev.stopImmediatePropagation();
-    if(guard) return; guard = true;
-    var ok = confirm("⚠️ Réinitialiser la LISTE aux valeurs intégrées (et remettre présences/montants à zéro) ?");
-    guard = false;
-    if(!ok) return;
+  let presents = 0, free = 0, zero = 0, paid = 0, total = 0;
 
-    try {
-      var rmKeys = [];
-      for (var i=0;i<localStorage.length;i++){
-        var k = localStorage.key(i);
-        if(k && /eneo|roster|csv|contacts|tdtl3/i.test(k)) rmKeys.push(k);
-      }
-      rmKeys.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
-    } catch(e){}
+  tbody.querySelectorAll("tr").forEach(tr=>{
+    const cb   = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
+    const euro = tr.querySelector('.amount input, input.euro');
+    const isPresent = !!(cb && cb.checked);
+    const raw = euro ? String(euro.value||"").trim() : "";
+    const val = raw==="" ? NaN : parseFloat(raw.replace(",", "."));
 
-    try {
-      var tbody = document.querySelector("tbody");
-      if(tbody){
-        var def = window.__defaultRosterHTML || localStorage.getItem("eneo-default-roster-html");
-        if(def){ tbody.innerHTML = def; }
-        tbody.querySelectorAll("tr").forEach(function(tr){
-          var cb = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present') || tr.querySelector('.pres input[type="checkbox"]');
-          var euro = tr.querySelector('.amount input, input.euro');
-          if(cb) cb.checked = false;
-          if(euro) euro.value = "";
-          setRowClass(tr,null);
-        });
-      }
-    } catch(e){}
+    if(isPresent){
+      presents++;
+      if(raw==="")       free++;
+      else if(!isNaN(val) && val<=0) zero++;
+      else if(!isNaN(val) && val>0)  { paid++; total += val; }
+    }
+  });
 
+  const set = (id, v)=>{ const el=document.getElementById(id); if(el) el.textContent=String(v).replace('.', ','); };
+
+  set("countPresence", presents);
+  set("countFree",      free);
+  set("countZero",      zero);
+  set("countPaid",      paid);
+  set("sumPaid",        total.toFixed(1).replace('.', ','));
+  const rows = tbody.querySelectorAll("tr").length;
+  set("inscritsCounter", rows);
+
+  // Compatibilité ancienne version
+  set("countPresent", presents);
+  set("totalEuro", total.toFixed(1));
+}
     updateCounters();
     try { localStorage.setItem("eneo-v4-state2", JSON.stringify({})); } catch(e){}
   }, true);
