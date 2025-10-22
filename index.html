@@ -1312,69 +1312,113 @@ tbody tr.state-green * { background-color: transparent; }
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) kick(); });
 })();
 </script>
-<!-- TDTL3 v5.1 — Anti-fantôme montant (verrou pour lignes décochées) -->
-<script id="tdtl3-v51-anti-ghost">
+<!-- TDTL3 v5.1 — Anti-autofill & verrou anti-réapparition -->
+<script id="tdtl3-anti-autofill-lock">
 (function(){
-  function enforceZeroOnUnchecked(tr){
-    var cb   = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present')
-             || tr.querySelector('.pres input[type="checkbox"]');
+  function isChecked(tr){
+    var cb = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present')
+           || tr.querySelector('.pres input[type="checkbox"]');
+    return !!(cb && cb.checked);
+  }
+  function lockZero(euro){
+    if(!euro) return;
+    // Désactive tout autofill connu et "dés-ancre" le champ
+    euro.autocomplete = 'off';
+    euro.setAttribute('autocomplete','off');
+    euro.inputmode = 'numeric';
+    // randomise name pour casser l’apprentissage d’autofill
+    if(!euro.__randName){
+      euro.__randName = 'euro_'+Math.random().toString(36).slice(2,8);
+      euro.setAttribute('name', euro.__randName);
+    }
+    // fige la valeur au *niveau source*
+    if(euro.value !== '0,0') euro.value = '0,0';
+    if(euro.defaultValue !== '0,0') euro.defaultValue = '0,0';  // <- clé anti-restore
+    if(euro.getAttribute('value') !== '0,0') euro.setAttribute('value','0,0');
+  }
+  function enforceRow(tr){
     var euro = tr.querySelector('.amount input, input.euro, input[type="number"]');
     if(!euro) return;
-    if(!cb || !cb.checked){
-      // On fige à 0,0 à la fois la valeur courante ET la valeur HTML (attribut)
-      if(euro.value !== '0,0') euro.value = '0,0';
-      if(euro.getAttribute('value') !== '0,0') euro.setAttribute('value','0,0');
-      // neutre
-      var trc = tr.classList; trc.remove('state-yellow','state-red','state-green');
+    if(!isChecked(tr)){       // décoché -> verrou 0,0
+      lockZero(euro);
+      tr.classList.remove('state-yellow','state-red','state-green');
     }
   }
-
   function sweep(){
-    document.querySelectorAll('tbody tr').forEach(enforceZeroOnUnchecked);
+    document.querySelectorAll('tbody tr').forEach(enforceRow);
   }
 
-  // Ré-enforcement en escalier (couvre les réinjections tardives)
-  function hardStabilize(){
-    [0,50,200,600,1200].forEach(function(d){ setTimeout(sweep, d); });
+  // Anti-restore agressif sur les premiers instants d’ouverture
+  function antiRestoreBurst(){
+    // 2s d’observation: 0ms, 60ms, 180ms, 400ms, 800ms, 1500ms
+    [0,60,180,400,800,1500].forEach(d=>setTimeout(sweep, d));
   }
 
-  // Au décochement : fige 0,0 + attribut value, et (optionnel) purge un vieux snapshot si présent
+  // Au décochement: verrouille immédiatement (et casse toute tentative d’autofill ultérieure)
   function onChange(ev){
     var tr = ev.target.closest && ev.target.closest('tr'); if(!tr) return;
-    var isCb = ev.target.matches && ev.target.matches('input[type="checkbox"]');
-    if(isCb){
-      var cb = ev.target;
-      if(!cb.checked){
-        enforceZeroOnUnchecked(tr);
-        // Optionnel : certaines anciennes versions utilisaient une clé snapshot
-        try{ localStorage.removeItem('eneo-v4-state2'); }catch(e){}
-        // Et on re-stabilise pour contrer toute injection tardive
-        hardStabilize();
-      }
+    if(ev.target.matches && ev.target.matches('input[type="checkbox"]') && !ev.target.checked){
+      enforceRow(tr);
+      antiRestoreBurst();
     }
   }
 
-  // Brancher proprement
   function arm(){
     var tb = document.querySelector('tbody'); if(!tb) return;
     tb.addEventListener('change', onChange, true);
-    // Mutation: si un script réécrit les lignes après coup, on re-stabilise
+    // Si le tableau est reconstruit (import/tri/veille), on re-verrouille
     try{
-      var mo = new MutationObserver(hardStabilize);
+      var mo = new MutationObserver(antiRestoreBurst);
       mo.observe(tb, {childList:true, subtree:true});
     }catch(e){}
   }
 
-  // Démarrage / réouverture : escalier d’application
+  // Démarrage / réouverture
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', hardStabilize, {once:true});
+    document.addEventListener('DOMContentLoaded', antiRestoreBurst, {once:true});
   } else {
-    hardStabilize();
+    antiRestoreBurst();
   }
-  window.addEventListener('pageshow', hardStabilize);
-  document.addEventListener('visibilitychange', function(){ if(!document.hidden) hardStabilize(); });
+  window.addEventListener('pageshow', antiRestoreBurst);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) antiRestoreBurst(); });
 
   arm();
+})();
+</script>
+<!-- TDTL3 v5.1 — Anti-flash montants au réveil -->
+<style id="tdtl3-anti-flash-css">
+  /* Pendant la stabilisation, on rend le texte des montants invisible
+     (le champ reste présent et garde sa place) */
+  .tdtl3-stealth tbody tr:not(.state-yellow):not(.state-green):not(.state-red) .amount input,
+  .tdtl3-stealth tbody tr .amount input {
+    color: transparent !important;
+    caret-color: transparent !important;
+  }
+</style>
+<script id="tdtl3-anti-flash-js">
+(function(){
+  function startStealth(){
+    document.body.classList.add('tdtl3-stealth');
+  }
+  function stopStealth(){
+    document.body.classList.remove('tdtl3-stealth');
+  }
+  function stabilize(){
+    // laisse tes autres patchs remettre 0,0,
+    // puis enlève le masque après un court délai
+    startStealth();
+    // mini escalier pour couvrir les restaurations lentes
+    setTimeout(stopStealth, 300);
+    setTimeout(stopStealth, 600);
+  }
+  // Au chargement/réouverture/retour avant-plan
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', stabilize, {once:true});
+  } else {
+    stabilize();
+  }
+  window.addEventListener('pageshow', stabilize);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) stabilize(); });
 })();
 </script>
 </script></body></html>
