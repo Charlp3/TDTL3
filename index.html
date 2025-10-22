@@ -1312,4 +1312,69 @@ tbody tr.state-green * { background-color: transparent; }
   document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) kick(); });
 })();
 </script>
+<!-- TDTL3 v5.1 — Anti-fantôme montant (verrou pour lignes décochées) -->
+<script id="tdtl3-v51-anti-ghost">
+(function(){
+  function enforceZeroOnUnchecked(tr){
+    var cb   = tr.querySelector('.pres input[type="checkbox"], input.present, input[type="checkbox"].present')
+             || tr.querySelector('.pres input[type="checkbox"]');
+    var euro = tr.querySelector('.amount input, input.euro, input[type="number"]');
+    if(!euro) return;
+    if(!cb || !cb.checked){
+      // On fige à 0,0 à la fois la valeur courante ET la valeur HTML (attribut)
+      if(euro.value !== '0,0') euro.value = '0,0';
+      if(euro.getAttribute('value') !== '0,0') euro.setAttribute('value','0,0');
+      // neutre
+      var trc = tr.classList; trc.remove('state-yellow','state-red','state-green');
+    }
+  }
+
+  function sweep(){
+    document.querySelectorAll('tbody tr').forEach(enforceZeroOnUnchecked);
+  }
+
+  // Ré-enforcement en escalier (couvre les réinjections tardives)
+  function hardStabilize(){
+    [0,50,200,600,1200].forEach(function(d){ setTimeout(sweep, d); });
+  }
+
+  // Au décochement : fige 0,0 + attribut value, et (optionnel) purge un vieux snapshot si présent
+  function onChange(ev){
+    var tr = ev.target.closest && ev.target.closest('tr'); if(!tr) return;
+    var isCb = ev.target.matches && ev.target.matches('input[type="checkbox"]');
+    if(isCb){
+      var cb = ev.target;
+      if(!cb.checked){
+        enforceZeroOnUnchecked(tr);
+        // Optionnel : certaines anciennes versions utilisaient une clé snapshot
+        try{ localStorage.removeItem('eneo-v4-state2'); }catch(e){}
+        // Et on re-stabilise pour contrer toute injection tardive
+        hardStabilize();
+      }
+    }
+  }
+
+  // Brancher proprement
+  function arm(){
+    var tb = document.querySelector('tbody'); if(!tb) return;
+    tb.addEventListener('change', onChange, true);
+    // Mutation: si un script réécrit les lignes après coup, on re-stabilise
+    try{
+      var mo = new MutationObserver(hardStabilize);
+      mo.observe(tb, {childList:true, subtree:true});
+    }catch(e){}
+  }
+
+  // Démarrage / réouverture : escalier d’application
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', hardStabilize, {once:true});
+  } else {
+    hardStabilize();
+  }
+  window.addEventListener('pageshow', hardStabilize);
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) hardStabilize(); });
+
+  arm();
+})();
+</script>
 </script></body></html>
